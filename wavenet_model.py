@@ -288,14 +288,14 @@ class WaveNetModel(nn.Module):
         for q in self.dilated_queues:
             q.dtype = type
 
-        super().cpu(type)
+        super().cpu()
 
     def cuda(self, device, type):
         self.dtype = type
         for q in self.dilated_queues:
             q.dtype = type
 
-        super().cuda(device, type)
+        super().cuda(device)
 
 
 def load_latest_model_from(location, use_cuda=True):
