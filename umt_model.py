@@ -6,7 +6,7 @@ import torch.nn.functional as F
 DOMAINS = ["Ed Sheeran", "Metallica"]
 
 ENC_LEN = 64
-POOL_KERNEL = 800
+POOL_KERNEL = 50
 SR = 16000
 
 class UmtModel(nn.Module):
@@ -46,6 +46,8 @@ class UmtModel(nn.Module):
         # Run through encoder
         enc = self.encoder.forward(input)
         latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
+        print("latent sizes", enc.size(), latent.size())
+        latent = latent[:,:,:ENC_LEN]
 
         # TODO: DOMAIN CLASSIFIER, from outside... only if training
 
