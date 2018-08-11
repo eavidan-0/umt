@@ -63,9 +63,16 @@ class UmtModel(nn.Module):
         s = sum([np.prod(list(d.size())) for d in par])
         return s
 
-    def cpu(self, type=torch.FloatTensor):
+    def cpu(self, type):
         self.encoder.cpu(type)
         for d in self.decoders:
             d.cpu(type)
 
-        super().cpu()
+        super().cpu(type)
+
+    def cuda(self, type):
+        self.encoder.cuda(type)
+        for d in self.decoders:
+            d.cuda(type)
+
+        super().cuda(type)
