@@ -33,6 +33,7 @@ class UmtModel(nn.Module):
     def forward(self, input):
         domain_index_tensor, input = input
         domain_index = domain_index_tensor.data[0]
+        input_size = input.size()
         
         assert domain_index < len(
             self.decoders), "Unknown domain #%d" % domain_idx
@@ -46,9 +47,6 @@ class UmtModel(nn.Module):
         # Run through encoder
         enc = self.encoder.forward(input)
         latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
-        print("latent sizes", enc.size(), latent.size())
-        latent = latent[:,:,:ENC_LEN]
-
         # TODO: DOMAIN CLASSIFIER, from outside... only if training
 
         # Upsample back to original sampling rate
