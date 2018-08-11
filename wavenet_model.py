@@ -283,11 +283,19 @@ class WaveNetModel(nn.Module):
         s = sum([np.prod(list(d.size())) for d in par])
         return s
 
-    def cpu(self, type=torch.FloatTensor):
+    def cpu(self, type):
         self.dtype = type
         for q in self.dilated_queues:
-            q.dtype = self.dtype
-        super().cpu()
+            q.dtype = type
+
+        super().cpu(type)
+
+    def cuda(self, type):
+        self.dtype = type
+        for q in self.dilated_queues:
+            q.dtype = type
+
+        super().cuda(type)
 
 
 def load_latest_model_from(location, use_cuda=True):

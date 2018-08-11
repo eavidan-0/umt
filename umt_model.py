@@ -68,4 +68,11 @@ class UmtModel(nn.Module):
         for d in self.decoders:
             d.cpu(type)
 
-        super().cpu()
+        super().cpu(type)
+
+    def cuda(self, type=torch.cuda.FloatTensor):
+        self.encoder.cuda(type)
+        for d in self.decoders:
+            d.cuda(type)
+
+        super().cuda(type)
