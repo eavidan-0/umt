@@ -1,5 +1,6 @@
 import time
-from wavenet_model import *
+from umt_model import *
+from UmtDataset import *
 from audio_data import WavenetDataset
 from wavenet_training import *
 from model_logging import *
@@ -14,15 +15,7 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
-model = WaveNetModel(layers=10,
-                     blocks=3,
-                     dilation_channels=32,
-                     residual_channels=32,
-                     skip_channels=1024,
-                     end_channels=512,
-                     output_length=16,
-                     dtype=dtype,
-                     bias=True)
+model = UmtModel(dtype)
 
 #model = load_latest_model_from('snapshots', use_cuda=True)
 #model = torch.load('snapshots/some_model')
@@ -35,16 +28,19 @@ print('model: ', model)
 print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
 
-data = WavenetDataset(dataset_file='train_samples/bach_chaconne/dataset.npz',
-                      item_length=model.receptive_field + model.output_length - 1,
-                      target_length=model.output_length,
-                      file_location='train_samples/bach_chaconne',
-                      test_stride=500)
-print('the dataset has ' + str(len(data)) + ' items')
+item_length = model.receptive_field[0] + model.output_length[1] - 1
+target_length = model.output_length[1]
 
+print ('item_length', item_length)
+print ('target_length', target_length)
+
+data = UmtDataset(item_length=item_length,
+                target_length=target_length,
+                train=True,
+                test_stride=500)
 
 def generate_and_log_samples(step):
-    sample_length=32000
+    sample_length = 32000
     gen_model = load_latest_model_from('snapshots', use_cuda=False)
     print("start generating...")
     samples = generate_audio(gen_model,
@@ -72,13 +68,13 @@ trainer = WavenetTrainer(model=model,
                          lr=0.0001,
                          weight_decay=0.0,
                          snapshot_path='snapshots',
-                         snapshot_name='chaconne_model',
+                         snapshot_name='umt_model',
                          snapshot_interval=1000,
                          logger=logger,
                          dtype=dtype,
                          ltype=ltype)
 
 print('start training...')
-trainer.train(batch_size=16,
+trainer.train(batch_size=BATCH_SIZE,
               epochs=10,
               continue_training_at_step=0)
