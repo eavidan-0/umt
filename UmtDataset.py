@@ -4,7 +4,7 @@ import torch
 import numpy as np
 
 DATASET_SOURCE_BASE = "/home/eavidan/Music/"
-DATASET_LOCATION = "./data/"
+DATASET_LOCATION = "./datasets/"
 
 BATCH_SIZE = 16
 
