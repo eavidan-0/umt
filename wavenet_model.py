@@ -288,12 +288,24 @@ class WaveNetModel(nn.Module):
         for q in self.dilated_queues:
             q.dtype = type
 
+        for c in self.dilated_convs:
+            c.cpu()
+
+        for c in self.residual_convs:
+            c.cpu()
+
         super().cpu()
 
     def cuda(self, device, type):
         self.dtype = type
         for q in self.dilated_queues:
             q.dtype = type
+
+        for c in self.dilated_convs:
+            c.cuda(device)
+
+        for c in self.residual_convs:
+            c.cuda(device)
 
         super().cuda(device)
 
