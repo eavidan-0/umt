@@ -151,8 +151,8 @@ class WaveNetModel(nn.Module):
         print(l, self.output_length, l < self.output_length)
         l = self.output_length
         x = x[:, :, -l:]
-        x = x.transpose(1, 2).contiguous()
-        x = x.view(n * l, c)
+        # x = x.transpose(1, 2).contiguous()
+        # x = x.view(n * l, c)
         return x
 
     def generate(self,
