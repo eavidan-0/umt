@@ -4,10 +4,10 @@ import torch
 import torch.nn.functional as F
 
 DOMAINS = ["Ed Sheeran", "Metallica"]
+
 ENC_LEN = 64
 POOL_KERNEL = 800
 SR = 16000
-
 
 class UmtModel(nn.Module):
     def __init__(self, dtype):

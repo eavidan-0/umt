@@ -148,6 +148,7 @@ class WaveNetModel(nn.Module):
 
         # reshape output
         [n, c, l] = x.size()
+        print(l, self.output_length, l < self.output_length)
         l = self.output_length
         x = x[:, :, -l:]
         x = x.transpose(1, 2).contiguous()
