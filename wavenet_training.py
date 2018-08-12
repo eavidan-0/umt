@@ -64,9 +64,10 @@ class WavenetTrainer:
             tic = time.time()
             for (domain_index, x, target) in iter(self.dataloader):
                 x = Variable(x.type(self.dtype))
-                target = Variable(target.view(-1).type(self.ltype))
+                target = Variable(target.type(self.ltype)) # target = Variable(target.view(-1).type(self.ltype))
 
                 output = self.model((domain_index, x))
+
                 print(output.size(), target.size())
                 loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()

@@ -127,9 +127,11 @@ class WavenetDataset(torch.utils.data.Dataset):
             sample = np.concatenate((sample1, sample2))
 
         example = torch.from_numpy(sample).type(torch.LongTensor)
-        one_hot = torch.FloatTensor(self.classes, self._item_length).zero_()
-        one_hot.scatter_(0, example[:self._item_length].unsqueeze(0), 1.)
+        input = example[:self._item_length].unsqueeze(0)
         target = example[-self.target_length:].unsqueeze(0)
+
+        one_hot = torch.FloatTensor(self.classes, self._item_length).zero_()
+        one_hot.scatter_(0, input, 1.)
 
         return self.domain_index, one_hot, target
 
