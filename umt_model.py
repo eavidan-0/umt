@@ -30,8 +30,8 @@ class UmtModel(nn.Module):
             self.encoder.receptive_field, d.receptive_field]
         self.output_length = [self.encoder.output_length, d.output_length]
 
-    def forward(self, input):
-        domain_index_tensor, input = input
+    def forward(self, input_tuple):
+        domain_index_tensor, input = input_tuple
         domain_index = domain_index_tensor.data[0]
         input_size = input.size()
         
