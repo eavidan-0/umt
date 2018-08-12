@@ -50,7 +50,7 @@ class UmtModel(nn.Module):
         # TODO: DOMAIN CLASSIFIER, from outside... only if training
 
         # Upsample back to original sampling rate
-        upsampled_latent = F.upsample(latent, size=input_size[2], mode='nearest')
+        upsampled_latent = F.interpolate(latent, size=input_size[2], mode='nearest')
 
         # Run through domain decoder
         out = self.decoders[domain_index].forward(upsampled_latent)
