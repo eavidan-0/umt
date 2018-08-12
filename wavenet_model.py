@@ -108,6 +108,9 @@ class WaveNetModel(nn.Module):
 
         x = self.start_conv(input)
 
+        if 1 == 1:
+            return input
+
         # WaveNet layers
         for i in range(self.blocks * self.layers):
             # Step 1: ReLU
