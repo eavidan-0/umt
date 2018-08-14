@@ -1,10 +1,12 @@
-import time
 from umt_model import *
 from UmtDataset import *
 from audio_data import WavenetDataset
 from wavenet_training import *
 from model_logging import *
 from scipy.io import wavfile
+
+from time import sleep
+sleep(2)
 
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
@@ -25,7 +27,7 @@ print ('item_length', item_length)
 print ('target_length', target_length)
 
 # reload snapshot
-continue_training_at_step = 3000
+continue_training_at_step = 6230
 model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
 # model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
