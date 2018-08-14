@@ -2,6 +2,7 @@ import torch
 import torch.optim as optim
 import torch.utils.data
 import time
+import os
 from datetime import datetime
 import torch.nn.functional as F
 from torch.autograd import Variable
@@ -16,6 +17,8 @@ def print_last_loss(opt):
 def print_last_validation_result(opt):
     print("validation loss: ", opt.validation_results[-1])
 
+NUM_GPU = 4
+os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[1:-1].replace(" ", "")
 
 class WavenetTrainer:
     def __init__(self,
@@ -31,7 +34,7 @@ class WavenetTrainer:
                  snapshot_interval=100,
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
-        self.model = nn.parallel.DistributedDataParallel(model)
+        self.model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
         self.dataset = dataset
         self.dataloader = None
         self.lr = lr
