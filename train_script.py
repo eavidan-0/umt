@@ -6,7 +6,7 @@ from model_logging import *
 from scipy.io import wavfile
 
 from time import sleep
-sleep(2)
+sleep(1000)
 
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
@@ -27,7 +27,7 @@ print ('item_length', item_length)
 print ('target_length', target_length)
 
 # reload snapshot
-continue_training_at_step = 6230
+continue_training_at_step = 9460
 model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
 # model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
