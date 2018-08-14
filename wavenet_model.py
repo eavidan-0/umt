@@ -114,7 +114,7 @@ class WaveNetModel(nn.Module):
             # residual = F.relu(x)
 
             # Step 2: dilated convolution
-            residual = self.dilated_convs[i](residual)
+            residual = self.dilated_convs[i](x)
 
             # Step 3: ReLU
             # residual = F.relu(residual)
