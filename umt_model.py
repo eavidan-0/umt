@@ -20,9 +20,9 @@ class UmtModel(nn.Module):
                                     output_length=ENC_LEN * POOL_KERNEL,
                                     dtype=dtype)
 
-        self.decoders = nn.ModuleList()(modules=[WaveNetModel(blocks=4,
-                                                              output_length=SR,
-                                                              dtype=dtype) for _ in DOMAINS])
+        self.decoders = nn.ModuleList(modules=[WaveNetModel(blocks=4,
+                                                            output_length=SR,
+                                                            dtype=dtype) for _ in DOMAINS])
 
         d = self.decoders[0]
         e = self.encoder
