@@ -40,8 +40,6 @@ class UmtModel(nn.Module):
         assert all([d == domain_index for d in domain_index_tensor.data]
                    ), "Mixed domain batch encountered"
 
-        print ("remember you need to understand input size...", input.size())
-
         # TODO: Pitch modulation, only if training
 
         # Run through encoder
