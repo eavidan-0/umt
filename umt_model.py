@@ -9,6 +9,7 @@ ENC_LEN = 64
 POOL_KERNEL = 50
 SR = 16000
 
+
 class UmtModel(nn.Module):
     def __init__(self, dtype):
         super(UmtModel, self).__init__()
@@ -19,24 +20,23 @@ class UmtModel(nn.Module):
                                     output_length=ENC_LEN * POOL_KERNEL,
                                     dtype=dtype)
 
-        self.decoders = []
-        for _ in range(len(DOMAINS)):
-            self.decoders.append(WaveNetModel(blocks=4,
-                                              output_length=SR,
-                                              dtype=dtype))
+        # self.decoders = list([WaveNetModel(blocks=4,
+        #                                    output_length=SR,
+        #                                    dtype=dtype) for _ in DOMAINS])
 
-        d = self.decoders[0]
-        self.receptive_field = [
-            self.encoder.receptive_field, d.receptive_field]
-        self.output_length = [self.encoder.output_length, d.output_length]
+        # d = self.decoders[0]
+        e = self.encoder
+
+        self.receptive_field = [e.receptive_field, e.receptive_field]
+        self.output_length = [e.output_length, e.output_length]
 
     def forward(self, input_tuple):
         domain_index_tensor, input = input_tuple
         domain_index = domain_index_tensor.data[0]
         input_size = input.size()
-        
-        assert domain_index < len(
-            self.decoders), "Unknown domain #%d" % domain_idx
+
+        # assert domain_index < len(
+        #     self.decoders), "Unknown domain #%d" % domain_idx
         assert all([d == domain_index for d in domain_index_tensor.data]
                    ), "Mixed domain batch encountered"
 
@@ -50,13 +50,14 @@ class UmtModel(nn.Module):
         # TODO: DOMAIN CLASSIFIER, from outside... only if training
 
         # Upsample back to original sampling rate
-        upsampled_latent = F.interpolate(latent, size=input_size[2], mode='nearest')
+        upsampled_latent = F.interpolate(
+            latent, size=input_size[2], mode='nearest')
 
         # Run through domain decoder
-        out = self.decoders[domain_index].forward(upsampled_latent)
+        # out = self.decoders[domain_index].forward(upsampled_latent)
 
         # TODO: mu-law again?
-        return out
+        return upsampled_latent
 
     def parameter_count(self):
         par = list(self.parameters())
@@ -65,14 +66,14 @@ class UmtModel(nn.Module):
 
     def cpu(self, type=torch.FloatTensor):
         self.encoder.cpu(type)
-        for d in self.decoders:
-            d.cpu(type)
+        # for d in self.decoders:
+        #     d.cpu(type)
 
         super().cpu()
 
     def cuda(self, device=None, type=torch.cuda.FloatTensor):
         self.encoder.cuda(device, type)
-        for d in self.decoders:
-            d.cuda(device, type)
+        # for d in self.decoders:
+        #     d.cuda(device, type)
 
         super().cuda(device)
