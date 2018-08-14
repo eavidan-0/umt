@@ -111,16 +111,16 @@ class WaveNetModel(nn.Module):
         # # WaveNet layers
         for i in range(self.blocks * self.layers):
             # Step 1: ReLUs
-            residual = F.relu(x)
+            # residual = F.relu(x)
 
             # Step 2: dilated convolution
-            residual = self.dilated_convs[i](residual)
+            # residual = self.dilated_convs[i](residual)
 
             # Step 3: ReLU
-            residual = F.relu(residual)
+            # residual = F.relu(residual)
 
             # Step 4: Just a 1x1 convolution
-            residual = self.residual_convs[i](residual)
+            residual = self.residual_convs[i](x)
 
             # Step 5: Skip and Residual summation
             # start_idx overcomes dilated_conv with non-integer padding being rounded
