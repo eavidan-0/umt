@@ -120,12 +120,12 @@ class WaveNetModel(nn.Module):
             # residual = F.relu(residual)
 
             # Step 4: Just a 1x1 convolution
-            residual = self.residual_convs[i](x)
+            # residual = self.residual_convs[i](x)
 
             # Step 5: Skip and Residual summation
             # start_idx overcomes dilated_conv with non-integer padding being rounded
-            start_idx = 0 if x.size() == residual.size() else (self.kernel_size - 1)
-            x += residual[:, :, start_idx:]
+            start_idx = 0 if x.size() == x.size() else (self.kernel_size - 1)
+            x += x[:, :, start_idx:]
 
         # TODO: we need the next three lines? not in article..
         x = F.relu(x)
