@@ -105,30 +105,32 @@ class WaveNetModel(nn.Module):
         self.receptive_field = receptive_field
 
     def wavenet(self, input):
+
         x = self.start_conv(input)
 
         # WaveNet layers
         for i in range(self.blocks * self.layers):
             # Step 1: ReLU
-            residual_1 = F.relu(x)
+            # residual = F.relu(x)
 
             # Step 2: dilated convolution
-            residual_2 = self.dilated_convs[i](residual_1)
+            residual = self.dilated_convs[i](residual)
 
             # Step 3: ReLU
-            residual_3 = F.relu(residual_2)
+            # residual = F.relu(residual)
 
             # Step 4: Just a 1x1 convolution
-            residual_4 = self.residual_convs[i](residual_3)
+            residual = self.residual_convs[i](residual)
 
             # Step 5: Skip and Residual summation
             # start_idx overcomes dilated_conv with non-integer padding being rounded
-            start_idx = 0 if x.size() == residual_4.size() else (self.kernel_size - 1)
-            x += residual_4[:, :, start_idx:]
+            start_idx = 0 if x.size() == residual.size() else (self.kernel_size - 1)
+            x += residual[:, :, start_idx:]
 
-        # TODO: we need the next two lines? not in article..
-        x = F.relu(x)
-        x = F.relu(self.end_conv_1(x))
+        # TODO: we need the next three lines? not in article..
+        # x = F.relu(x)
+        x = self.end_conv_1(x)
+        # x = F.relu(x)
         x = self.end_conv_2(x)
 
         return x
