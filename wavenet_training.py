@@ -71,8 +71,8 @@ class WavenetTrainer:
                 loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()
                 loss.backward()
-                loss = loss.data[0]
-                
+                loss = loss.item()
+
                 print("loss", loss)
 
                 if self.clip is not None:

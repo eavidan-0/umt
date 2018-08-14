@@ -51,7 +51,7 @@ class UmtModel(nn.Module):
 
         # Upsample back to original sampling rate
         upsampled_latent = F.interpolate(
-            latent, size=input_size[2], mode='nearest')  # TODO: maybe everything SR?
+            latent, size=SR, mode='nearest')  # TODO: maybe everything SR? input_size[2]
 
         # Run through domain decoder
         out = self.decoders[domain_index].forward(upsampled_latent)
