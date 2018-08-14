@@ -77,8 +77,6 @@ class WavenetTrainer:
                 loss.backward()
                 loss = loss.item()
 
-                print("loss", loss)
-
                 if self.clip is not None:
                     torch.nn.utils.clip_grad_norm(
                         self.model.parameters(), self.clip)
@@ -88,7 +86,7 @@ class WavenetTrainer:
                 # time step duration:
                 if step == 10:
                     toc = time.time()
-                    print("one training step does take approximately " +
+                    print("step", step, ", loss: ", loss, ". one training step does take approximately " +
                           str((toc - tic) * 0.1) + " seconds)")
 
                 if step % self.snapshot_interval == 0:
