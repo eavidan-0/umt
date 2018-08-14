@@ -17,7 +17,7 @@ class UmtModel(nn.Module):
         # TODO: is this really the correct output?
         # Cause they said 12.5 downsample, not 250
         self.encoder = WaveNetModel(blocks=3,
-                                    output_length=ENC_LEN * POOL_KERNEL,
+                                    output_length=16000,
                                     dtype=dtype)
 
         # self.decoders = list([WaveNetModel(blocks=4,
@@ -46,18 +46,18 @@ class UmtModel(nn.Module):
 
         # Run through encoder
         enc = self.encoder.forward(input)
-        latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
+        # latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
         # TODO: DOMAIN CLASSIFIER, from outside... only if training
 
-        # Upsample back to original sampling rate
-        upsampled_latent = F.interpolate(
-            latent, size=input_size[2] - self.receptive_field[0] + 1, mode='nearest')
+        # # Upsample back to original sampling rate
+        # upsampled_latent = F.interpolate(
+        #     enc, size=input_size[2] - self.receptive_field[0] + 1, mode='nearest')
 
         # Run through domain decoder
         # out = self.decoders[domain_index].forward(upsampled_latent)
 
         # TODO: mu-law again?
-        return upsampled_latent
+        return enc
 
     def parameter_count(self):
         par = list(self.parameters())
