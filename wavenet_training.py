@@ -67,12 +67,13 @@ class WavenetTrainer:
                 target = Variable(target.type(self.ltype)) # target = Variable(target.view(-1).type(self.ltype))
 
                 output = self.model((domain_index, x))
-                print(output.size(), target.size())
                 
                 loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()
                 loss.backward()
                 loss = loss.data[0]
+                
+                print("loss", loss)
 
                 if self.clip is not None:
                     torch.nn.utils.clip_grad_norm(
