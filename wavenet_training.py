@@ -84,10 +84,12 @@ class WavenetTrainer:
                 step += 1
 
                 # time step duration:
-                if step == 10:
+                if step % 10 == 0:
                     toc = time.time()
-                    print("step", step, ", loss: ", loss, ". one training step does take approximately " +
+                    print("step", step, "loss: ", loss, "one training step does take approximately " +
                           str((toc - tic) * 0.1) + " seconds)")
+                          
+                    tic = toc
 
                 if step % self.snapshot_interval == 0:
                     if self.snapshot_path is None:
