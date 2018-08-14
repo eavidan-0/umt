@@ -31,7 +31,7 @@ class WavenetTrainer:
                  snapshot_interval=100,
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
-        self.model = model
+        self.model = nn.parallel.DistributedDataParallel(model)
         self.dataset = dataset
         self.dataloader = None
         self.lr = lr
