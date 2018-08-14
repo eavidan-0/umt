@@ -28,7 +28,7 @@ class WavenetTrainer:
                  logger=Logger(),
                  snapshot_path=None,
                  snapshot_name='snapshot',
-                 snapshot_interval=1000,
+                 snapshot_interval=100,
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
         self.model = model
@@ -53,6 +53,7 @@ class WavenetTrainer:
               epochs=10,
               continue_training_at_step=0):
         self.model.train()
+        print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
                                                       #   shuffle=True,
@@ -82,10 +83,10 @@ class WavenetTrainer:
                 step += 1
 
                 # time step duration:
-                if step == 100:
+                if step == 10:
                     toc = time.time()
                     print("one training step does take approximately " +
-                          str((toc - tic) * 0.01) + " seconds)")
+                          str((toc - tic) * 0.1) + " seconds)")
 
                 if step % self.snapshot_interval == 0:
                     if self.snapshot_path is None:
