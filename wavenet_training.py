@@ -34,7 +34,7 @@ class WavenetTrainer:
                  snapshot_interval=100,
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
-        self.model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
+        self.model = model
         self.dataset = dataset
         self.dataloader = None
         self.lr = lr
@@ -88,7 +88,7 @@ class WavenetTrainer:
                     toc = time.time()
                     print("step", step, "loss: ", loss, "one training step does take approximately " +
                           str((toc - tic) * 0.1) + " seconds)")
-                          
+
                     tic = toc
 
                 if step % self.snapshot_interval == 0:

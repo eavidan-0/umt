@@ -15,30 +15,30 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
-# model = UmtModel(dtype)
-
-continue_training_at_step = 3000
-model = load_latest_model_from('snapshots', use_cuda=use_cuda)
-# model = torch.load('snapshots/some_model')
-
-if use_cuda:
-    print("move model to gpu")
-    model.cuda()
-
+model = UmtModel(dtype)
 print('model: ', model)
 print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
-
 item_length = model.receptive_field[0] + model.output_length[1] - 1
 target_length = model.output_length[1]
-
 print ('item_length', item_length)
 print ('target_length', target_length)
 
+# reload snapshot
+continue_training_at_step = 3000
+model = load_latest_model_from('snapshots', use_cuda=use_cuda)
+
+# model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
+
+# if use_cuda:
+#     print("move model to gpu")
+#     model.cuda()
+
 data = UmtDataset(item_length=item_length,
-                target_length=target_length,
-                train=True,
-                test_stride=500)
+                  target_length=target_length,
+                  train=True,
+                  test_stride=500)
+
 
 def generate_and_log_samples(step):
     sample_length = 32000
