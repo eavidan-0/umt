@@ -125,7 +125,7 @@ class WaveNetModel(nn.Module):
             # Step 5: Skip and Residual summation
             # start_idx overcomes dilated_conv with non-integer padding being rounded
             start_idx = 0 if x.size() == residual.size() else (self.kernel_size - 1)
-            x += residual[:, :, start_idx:]
+            x = residual[:, :, start_idx:]
 
         # TODO: we need the next three lines? not in article..
         x = F.relu(x)
