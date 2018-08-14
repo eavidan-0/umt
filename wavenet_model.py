@@ -111,13 +111,13 @@ class WaveNetModel(nn.Module):
         # # WaveNet layers
         # for i in range(self.blocks * self.layers):
         #     # Step 1: ReLU
-        #     # residual = F.relu(x)
+        #     residual = F.relu(x)
 
         #     # Step 2: dilated convolution
-        #     residual = self.dilated_convs[i](x)
+        #     residual = self.dilated_convs[i](residual)
 
         #     # Step 3: ReLU
-        #     # residual = F.relu(residual)
+        #     residual = F.relu(residual)
 
         #     # Step 4: Just a 1x1 convolution
         #     residual = self.residual_convs[i](residual)
@@ -128,9 +128,9 @@ class WaveNetModel(nn.Module):
         #     x += residual[:, :, start_idx:]
 
         # TODO: we need the next three lines? not in article..
-        # x = F.relu(x)
+        x = F.relu(x)
         x = self.end_conv_1(x)
-        # x = F.relu(x)
+        x = F.relu(x)
         x = self.end_conv_2(x)
 
         return x
