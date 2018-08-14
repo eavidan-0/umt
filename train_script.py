@@ -15,10 +15,11 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
-model = UmtModel(dtype)
+# model = UmtModel(dtype)
 
-#model = load_latest_model_from('snapshots', use_cuda=True)
-#model = torch.load('snapshots/some_model')
+continue_training_at_step = 3000
+model = load_latest_model_from('snapshots', use_cuda=use_cuda)
+# model = torch.load('snapshots/some_model')
 
 if use_cuda:
     print("move model to gpu")
@@ -77,4 +78,4 @@ trainer = WavenetTrainer(model=model,
 print('start training...')
 trainer.train(batch_size=BATCH_SIZE,
               epochs=10,
-              continue_training_at_step=0)
+              continue_training_at_step=continue_training_at_step)
