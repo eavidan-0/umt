@@ -30,7 +30,7 @@ class WaveNetModel(nn.Module):
     def __init__(self,
                  layers=10,
                  blocks=4,
-                 channels=128,
+                 channels=32,
                  classes=256,
                  output_length=32,
                  kernel_size=2,
