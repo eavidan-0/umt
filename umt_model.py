@@ -20,9 +20,9 @@ class UmtModel(nn.Module):
                                     output_length=ENC_LEN * POOL_KERNEL,
                                     dtype=dtype)
 
-        self.decoders = list([WaveNetModel(blocks=4,
-                                           output_length=SR,
-                                           dtype=dtype) for _ in DOMAINS])
+        self.decoders = nn.ModuleList()(modules=[WaveNetModel(blocks=4,
+                                                              output_length=SR,
+                                                              dtype=dtype) for _ in DOMAINS])
 
         d = self.decoders[0]
         e = self.encoder
@@ -51,7 +51,7 @@ class UmtModel(nn.Module):
 
         # Upsample back to original sampling rate
         upsampled_latent = F.interpolate(
-            latent, size=input_size[2], mode='nearest') # TODO: maybe everything SR?
+            latent, size=input_size[2], mode='nearest')  # TODO: maybe everything SR?
 
         # Run through domain decoder
         out = self.decoders[domain_index].forward(upsampled_latent)

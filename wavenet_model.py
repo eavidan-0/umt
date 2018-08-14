@@ -50,7 +50,7 @@ class WaveNetModel(nn.Module):
         receptive_field = 1
         prev_dilation = 1
 
-        self.dilated_convs = []
+        self.dilated_convs = nn.ModuleList()
         self.dilated_queues = []
         self.residual_convs = nn.ModuleList()
 
