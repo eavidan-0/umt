@@ -8,19 +8,15 @@ from scipy.io import wavfile
 from time import sleep
 sleep(2)
 
-print(1)
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
-print(2)
 
 use_cuda = torch.cuda.is_available()
-print(3, use_cuda)
 
 if use_cuda:
     print('use gpu')
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
-print(4)
 
 model = UmtModel(dtype)
 print('model: ', model)
