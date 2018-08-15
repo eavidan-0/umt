@@ -142,15 +142,17 @@ class WavenetDataset(torch.utils.data.Dataset):
             n_steps = random() - 0.5  # +- 0.5
             y[s:e] = lr.effects.pitch_shift(y[s:e], sr=self.sampling_rate, n_steps=n_steps)
 
+            print (min(y), max(y))
+
             # TODO: should I mU again?
             sample = quantize_data(y, self.classes, mu=True)
+            
 
         print (min(sample), max(sample))
         example = torch.from_numpy(sample).type(torch.LongTensor)
         input = example[:self._item_length].unsqueeze(0)
         target = example[-self.target_length:].unsqueeze(0)
 
-        print (min(input.squeeze()), max(input.squeeze()))
 
         one_hot = torch.FloatTensor(self.classes, self._item_length).zero_()
         one_hot.scatter_(0, input, 1.)
