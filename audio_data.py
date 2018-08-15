@@ -149,7 +149,7 @@ class WavenetDataset(torch.utils.data.Dataset):
         input = example[:self._item_length].unsqueeze(0)
         target = example[-self.target_length:].unsqueeze(0)
 
-        print (min(input), max(input))
+        print (min(input.squeeze()), max(input.squeeze()))
 
         one_hot = torch.FloatTensor(self.classes, self._item_length).zero_()
         one_hot.scatter_(0, input, 1.)
