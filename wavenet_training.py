@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from model_logging import Logger
 from wavenet_modules import *
 
+use_cuda = torch.cuda.is_available()
 
 def print_last_loss(opt):
     print("loss: ", opt.losses[-1])
@@ -55,7 +56,11 @@ class WavenetTrainer:
               batch_size,
               epochs=10,
               continue_training_at_step=0):
-        self.model.train()
+        model = self.model
+        if use_cuda:
+            model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
+            
+        model.train()
         print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
@@ -66,11 +71,13 @@ class WavenetTrainer:
         for current_epoch in range(epochs):
             print("epoch", current_epoch)
             tic = time.time()
-            for (domain_index, x, target) in iter(self.dataloader):
+            for data in iter(self.dataloader):
+                domain_index, x, target = data
+
                 x = Variable(x.type(self.dtype))
                 target = Variable(target.type(self.ltype)) # target = Variable(target.view(-1).type(self.ltype))
 
-                output = self.model((domain_index, x))
+                output = model(data)
                 
                 loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()
@@ -79,7 +86,7 @@ class WavenetTrainer:
 
                 if self.clip is not None:
                     torch.nn.utils.clip_grad_norm(
-                        self.model.parameters(), self.clip)
+                        model.parameters(), self.clip)
                 self.optimizer.step()
                 step += 1
 

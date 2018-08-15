@@ -8,6 +8,8 @@ import numpy as np
 import librosa as lr
 import bisect
 
+from random import random, randint
+
 
 class WavenetDataset(torch.utils.data.Dataset):
     def __init__(self,
@@ -126,6 +128,24 @@ class WavenetDataset(torch.utils.data.Dataset):
             sample2 = file2[:end_position_in_next_file]
             sample = np.concatenate((sample1, sample2))
 
+        # Only if training: Pitch modulation
+        # TODO: is this different every time?
+        # TODO: this should have been before mu-law...
+        if self.train:
+            # Reverse quantization
+            y = (sample - self.classes / 2 + 1) / float(self.classes) * 2
+            print (y)
+
+            seg_length = int(SR * (random() * 0.25 + 0.25))  # 1/4 -> 1/2
+            s = randint(0, SR - seg_length)
+            e = s + seg_length
+
+            n_steps = random() - 0.5  # +- 0.5
+            y[s:e] = lr.effects.pitch_shift(y[s:e], sr=SR, n_steps=n_steps)
+
+            # TODO: should I mU again?
+            sample = quantize_data(y, self.classes, mu=True)
+
         example = torch.from_numpy(sample).type(torch.LongTensor)
         input = example[:self._item_length].unsqueeze(0)
         target = example[-self.target_length:].unsqueeze(0)
@@ -143,22 +163,32 @@ class WavenetDataset(torch.utils.data.Dataset):
             return test_length
 
 
-def quantize_data(data, classes):
-    mu_x = mu_law_encoding(data, classes)
+def quantize_data(data, classes, mu=True):
+    x = data
+    if mu:
+        x = mu_law_encoding(x, classes)
+
     bins = np.linspace(-1, 1, classes)
-    quantized = np.digitize(mu_x, bins) - 1
+    quantized = np.digitize(x, bins) - 1
     return quantized
 
 
 def list_all_audio_files(location):
     audio_files = []
-    for dirpath, dirnames, filenames in os.walk(location):
-        for filename in [f for f in filenames if f.endswith((".m4a", ".mp3", ".wav", ".aif", "aiff"))]:
-            audio_files.append(os.path.join(dirpath, filename))
+    if is_music_file(location):
+        audio_files.append(location)
+    else:
+        for dirpath, dirnames, filenames in os.walk(location):
+            for filename in [f for f in filenames if is_music_file(f)]:
+                audio_files.append(os.path.join(dirpath, filename))
 
     if len(audio_files) == 0:
         print("found no audio files in " + location)
     return audio_files
+
+
+def is_music_file(f):
+    return f.endswith((".m4a", ".mp3", ".wav", ".aif", "aiff"))
 
 
 def mu_law_encoding(data, mu):

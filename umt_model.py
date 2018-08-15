@@ -2,6 +2,7 @@ from wavenet_model import *
 import numpy as np
 import torch
 import torch.nn.functional as F
+import librosa as lr
 
 DOMAINS = ["Ed Sheeran", "Metallica"]
 
@@ -11,18 +12,24 @@ SR = 16000
 
 
 class UmtModel(nn.Module):
-    def __init__(self, dtype):
+    def __init__(self, dtype, classes=256, train=True):
         super(UmtModel, self).__init__()
+
+        self.classes = classes
+        self.train = train
 
         # TODO: is this really the correct output?
         # Cause they said 12.5 downsample, not 250
         self.encoder = WaveNetModel(blocks=3,
+                                    classes=self.classes,
                                     output_length=ENC_LEN * POOL_KERNEL,
                                     dtype=dtype)
 
-        self.decoders = nn.ModuleList(modules=[WaveNetModel(blocks=4,
-                                                            output_length=SR,
-                                                            dtype=dtype) for _ in DOMAINS])
+        decoders = [WaveNetModel(blocks=4,
+                                 classes=self.classes,
+                                 output_length=SR,
+                                 dtype=dtype) for _ in DOMAINS]
+        self.decoders = nn.ModuleList(modules=decoders)
 
         d = self.decoders[0]
         e = self.encoder
@@ -30,8 +37,14 @@ class UmtModel(nn.Module):
         self.receptive_field = [e.receptive_field, d.receptive_field]
         self.output_length = [e.output_length, d.output_length]
 
+        # self.item_length = model.receptive_field[0] + model.output_length[1] - 1
+        self.item_length = SR
+        self.target_length = SR
+
     def forward(self, input_tuple):
-        domain_index_tensor, input = input_tuple
+        torch.set_grad_enabled(self.train)
+
+        domain_index_tensor, input, target = input_tuple
         domain_index = domain_index_tensor.data[0]
         input_size = input.size()
 
@@ -40,21 +53,29 @@ class UmtModel(nn.Module):
         assert all([d == domain_index for d in domain_index_tensor.data]
                    ), "Mixed domain batch encountered"
 
-        # TODO: Pitch modulation, only if training
-
         # Run through encoder
         enc = self.encoder.forward(input)
         latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
-        # TODO: DOMAIN CLASSIFIER, from outside... only if training
+
+        # Only if training: DOMAIN CLASSIFIER
+        if self.train:
+            # TODO: get it from outside so it can train separately
+            pass
 
         # Upsample back to original sampling rate
-        upsampled_latent = F.interpolate(
-            latent, size=SR, mode='nearest')  # TODO: maybe everything SR? input_size[2]
+        # TODO: maybe everything SR? input_size[2]
+        upsampled_latent = F.interpolate(latent, size=SR, mode='nearest')
 
         # Run through domain decoder
         out = self.decoders[domain_index].forward(upsampled_latent)
 
         # TODO: mu-law again?
+
+        # decode
+        if not self.train:
+            # TODO: or encode? or nothing at all?
+            out = mu_law_expansion(out, self.classes)
+
         return out
 
     def parameter_count(self):
