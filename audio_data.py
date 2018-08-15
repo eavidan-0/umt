@@ -131,9 +131,9 @@ class WavenetDataset(torch.utils.data.Dataset):
         # TODO: is this different every time?
         # TODO: this should have been before mu-law...
         if self.train:
-            # Reverse quantization
+            # Reverse quantization and encoding
             y = (sample - self.classes / 2 + 1) / float(self.classes) * 2
-            print (y)
+            y = mu_law_expansion(y, self.classes)
 
             seg_length = int(self.sampling_rate * (random() * 0.25 + 0.25))  # 1/4 -> 1/2
             s = randint(0, self.sampling_rate - seg_length)
@@ -148,6 +148,8 @@ class WavenetDataset(torch.utils.data.Dataset):
         example = torch.from_numpy(sample).type(torch.LongTensor)
         input = example[:self._item_length].unsqueeze(0)
         target = example[-self.target_length:].unsqueeze(0)
+
+        print (min(input), max(input))
 
         one_hot = torch.FloatTensor(self.classes, self._item_length).zero_()
         one_hot.scatter_(0, input, 1.)
