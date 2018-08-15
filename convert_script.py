@@ -11,8 +11,8 @@ sleep(2)
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
 
-model = load_latest_model_from('snapshots', use_cuda=False)
-# model = UmtModel(dtype)
+use_cuda = torch.cuda.is_available()
+model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 model.train = False
 
 print('model: ', model)
