@@ -62,7 +62,7 @@ class WavenetTrainer:
               batch_size,
               epochs=10,
               continue_training_at_step=0):
-        self.train_model.train()
+        self.model.train()
         print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
