@@ -16,7 +16,7 @@ class UmtModel(nn.Module):
         super(UmtModel, self).__init__()
 
         self.classes = classes
-        self.train = train
+        self.is_training = train
 
         # TODO: is this really the correct output?
         # Cause they said 12.5 downsample, not 250
@@ -42,7 +42,7 @@ class UmtModel(nn.Module):
         self.target_length = SR
 
     def forward(self, input_tuple):
-        torch.set_grad_enabled(self.train)
+        torch.set_grad_enabled(self.is_training)
 
         domain_index_tensor, input, target = input_tuple
         domain_index = domain_index_tensor.data[0]
@@ -58,7 +58,7 @@ class UmtModel(nn.Module):
         latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
 
         # Only if training: DOMAIN CLASSIFIER
-        if self.train:
+        if self.is_training:
             # TODO: get it from outside so it can train separately
             pass
 
@@ -72,7 +72,7 @@ class UmtModel(nn.Module):
         # TODO: mu-law again?
 
         # decode
-        if not self.train:
+        if not self.is_training:
             # TODO: or encode? or nothing at all?
             out = mu_law_expansion(out, self.classes)
 
