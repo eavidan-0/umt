@@ -136,12 +136,12 @@ class WavenetDataset(torch.utils.data.Dataset):
             y = (sample - self.classes / 2 + 1) / float(self.classes) * 2
             print (y)
 
-            seg_length = int(SR * (random() * 0.25 + 0.25))  # 1/4 -> 1/2
-            s = randint(0, SR - seg_length)
+            seg_length = int(self.sampling_rate * (random() * 0.25 + 0.25))  # 1/4 -> 1/2
+            s = randint(0, self.sampling_rate - seg_length)
             e = s + seg_length
 
             n_steps = random() - 0.5  # +- 0.5
-            y[s:e] = lr.effects.pitch_shift(y[s:e], sr=SR, n_steps=n_steps)
+            y[s:e] = lr.effects.pitch_shift(y[s:e], sr=self.sampling_rate, n_steps=n_steps)
 
             # TODO: should I mU again?
             sample = quantize_data(y, self.classes, mu=True)
