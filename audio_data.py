@@ -37,13 +37,13 @@ class WavenetDataset(torch.utils.data.Dataset):
         self.target_length = target_length
         self.classes = classes
         self.domain_index = domain_index
+        self.sampling_rate = sampling_rate
 
         if not os.path.isfile(dataset_file):
             assert file_location is not None, "no location for dataset files specified"
             self.mono = mono
             self.normalize = normalize
 
-            self.sampling_rate = sampling_rate
             self.dtype = dtype
             self.create_dataset(file_location, dataset_file)
         else:
@@ -52,7 +52,6 @@ class WavenetDataset(torch.utils.data.Dataset):
             self.mono = None
             self.normalize = None
 
-            self.sampling_rate = None
             self.dtype = None
 
         self.data = np.load(self.dataset_file, mmap_mode='r')
