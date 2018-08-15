@@ -141,7 +141,7 @@ class WavenetDataset(torch.utils.data.Dataset):
 
             n_steps = random() - 0.5  # +- 0.5
             shifted = lr.effects.pitch_shift(y[s:e], sr=self.sampling_rate, n_steps=n_steps)
-            y[s:e] = min(1, max(-1, shifted))
+            y[s:e] = np.clip(shifted, -1, 1)
 
             # TODO: should I mU again?
             sample = quantize_data(y, self.classes, mu=True)
