@@ -59,7 +59,6 @@ class WavenetTrainer:
         model = self.model
         if use_cuda:
             model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
-            model.cuda()
             
         model.train()
         print("dataset length is", len(self.dataset))
