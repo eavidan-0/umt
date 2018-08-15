@@ -145,6 +145,7 @@ class WavenetDataset(torch.utils.data.Dataset):
             # TODO: should I mU again?
             sample = quantize_data(y, self.classes, mu=True)
 
+        print (min(sample), max(sample))
         example = torch.from_numpy(sample).type(torch.LongTensor)
         input = example[:self._item_length].unsqueeze(0)
         target = example[-self.target_length:].unsqueeze(0)
