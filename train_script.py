@@ -29,6 +29,10 @@ print ('target_length', model.target_length)
 continue_training_at_step = 0
 # model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
+if use_cuda:
+    print("move model to gpu")
+    model.cuda()
+
 data = UmtDataset(item_length=model.item_length,
                   target_length=model.target_length,
                   train=True,

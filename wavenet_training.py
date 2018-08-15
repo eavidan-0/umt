@@ -11,6 +11,7 @@ from wavenet_modules import *
 
 use_cuda = torch.cuda.is_available()
 
+
 def print_last_loss(opt):
     print("loss: ", opt.losses[-1])
 
@@ -18,8 +19,11 @@ def print_last_loss(opt):
 def print_last_validation_result(opt):
     print("validation loss: ", opt.validation_results[-1])
 
+
 NUM_GPU = 4
-os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[1:-1].replace(" ", "")
+os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
+    1:-1].replace(" ", "")
+
 
 class WavenetTrainer:
     def __init__(self,
@@ -36,6 +40,8 @@ class WavenetTrainer:
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
         self.model = model
+        self.train_model = model if not use_cuda else nn.parallel.DataParallel(
+            model, device_ids=list(range(NUM_GPU)))
         self.dataset = dataset
         self.dataloader = None
         self.lr = lr
@@ -56,11 +62,7 @@ class WavenetTrainer:
               batch_size,
               epochs=10,
               continue_training_at_step=0):
-        model = self.model
-        if use_cuda:
-            model = nn.parallel.DataParallel(model, device_ids=list(range(NUM_GPU)))
-            
-        model.train()
+        self.train_model.train()
         print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
@@ -75,10 +77,11 @@ class WavenetTrainer:
                 domain_index, x, target = data
 
                 x = Variable(x.type(self.dtype))
-                target = Variable(target.type(self.ltype)) # target = Variable(target.view(-1).type(self.ltype))
+                # target = Variable(target.view(-1).type(self.ltype))
+                target = Variable(target.type(self.ltype))
 
-                output = model(data)
-                
+                output = self.train_model(data)
+
                 loss = F.cross_entropy(output.squeeze(), target.squeeze())
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -86,7 +89,7 @@ class WavenetTrainer:
 
                 if self.clip is not None:
                     torch.nn.utils.clip_grad_norm(
-                        model.parameters(), self.clip)
+                        self.train_model.parameters(), self.clip)
                 self.optimizer.step()
                 step += 1
 
