@@ -18,6 +18,10 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
+    NUM_GPU = 4
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
+        1:-1].replace(" ", "")
+
 model = UmtModel(dtype)
 print('model: ', model)
 print('receptive field: ', model.receptive_field)
@@ -38,6 +42,7 @@ data = UmtDataset(item_length=model.item_length,
                   target_length=model.target_length,
                   train=True,
                   test_stride=500)
+
 
 def generate_and_log_samples(step):
     sample_length = 32000

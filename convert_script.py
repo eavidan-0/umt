@@ -18,6 +18,10 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
+    NUM_GPU = 4
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
+        1:-1].replace(" ", "")
+
 model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 model.train = False
 
