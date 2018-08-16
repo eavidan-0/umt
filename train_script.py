@@ -23,7 +23,6 @@ if use_cuda:
         1:-1].replace(" ", "")
 
 model = UmtModel(dtype)
-print('model: ', model)
 print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
 

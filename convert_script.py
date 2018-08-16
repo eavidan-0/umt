@@ -29,7 +29,6 @@ if use_cuda:
     print("move model to gpu")
     model.cuda()
 
-print('model: ', model)
 print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
 
