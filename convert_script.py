@@ -47,7 +47,8 @@ input_files = list_all_audio_files(GENERATION_INPUTS)
 
 
 def convert_output_to_signal(x):
-    prob = F.softmax(x.squeeze().transpose(), dim=1) # map seconds to buckets
+    x = x.squeeze().transpose(0, 1)
+    prob = F.softmax(x, dim=1)  # map seconds to buckets
     prob = prob.cpu()
     np_prob = prob.data.numpy()
 
@@ -100,7 +101,7 @@ for in_file in input_files:
         generated = map(convert_output_to_signal, generated)
         generated = itertools.islice(generated, total)
         generated = sum(generated, [])
-        
+
         # convert data to signal...
         generated = (generated / model.classes) * 2. - 1
         generated = mu_law_expansion(generated, model.classes)
