@@ -99,7 +99,9 @@ for in_file in input_files:
         generated = map(model.forward, iter(dataloader))
         # generated = map(prog_callback, generated)
         generated = map(convert_output_to_signal, generated)
-        generated = itertools.islice(generated, total)
+        generated = list(itertools.islice(generated, total))
+        print (generated, generated[0])
+
         generated = np.concatenate(generated)
         print (generated)
 
