@@ -47,11 +47,14 @@ input_files = list_all_audio_files(GENERATION_INPUTS)
 
 
 def convert_output_to_signal(x):
-    prob = F.softmax(x.squeeze(), dim=0)
+    prob = F.softmax(x.squeeze().transpose(), dim=1) # map seconds to buckets
     prob = prob.cpu()
     np_prob = prob.data.numpy()
-    print (x.size(), np_prob.shape)
-    x = np.random.choice(model.classes, p=np_prob)
+
+    # Compute SM bucket for second
+    x = map(lambda p: np.random.choice(model.classes, p=p), prob)
+    x = np.array(x)
+    print(x.size)
     return x
 
 
@@ -97,9 +100,11 @@ for in_file in input_files:
         generated = map(convert_output_to_signal, generated)
         generated = itertools.islice(generated, total)
         generated = sum(generated, [])
-        # generated = mu_law_expansion(generated, model.classes)
+        
+        # convert data to signal...
+        generated = (generated / model.classes) * 2. - 1
+        generated = mu_law_expansion(generated, model.classes)
 
-        # TODO: convert data to signal...
         print (generated)
 
         out_path = GENERATION_OUTPUTS + filename + \
