@@ -50,12 +50,10 @@ def convert_output_to_signal(x):
     x = x.squeeze().transpose(0, 1)
     prob = F.softmax(x, dim=1)  # map seconds to buckets
     prob = prob.cpu()
-    np_prob = prob.data.numpy()
-
-    print (np_prob.shape, np_prob[0].shape)
+    np_prob = prob.data.numpy()size
 
     # Compute SM bucket for second
-    x = map(lambda p: np.random.choice(model.classes, p=p), prob)
+    x = map(lambda p: np.random.choice(model.classes, p=p), np_prob)
     x = np.array(x)
     print(x.shape)
     return x
