@@ -12,8 +12,18 @@ dtype = torch.FloatTensor
 ltype = torch.LongTensor
 
 use_cuda = torch.cuda.is_available()
+
+if use_cuda:
+    print('use gpu')
+    dtype = torch.cuda.FloatTensor
+    ltype = torch.cuda.LongTensor
+
 model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 model.train = False
+
+if use_cuda:
+    print("move model to gpu")
+    model.cuda()
 
 print('model: ', model)
 print('receptive field: ', model.receptive_field)
