@@ -73,8 +73,13 @@ for in_file in input_files:
         total = len(dataset)
         print (total, "samples")
 
+        def prog_callback(x):
+            print(str(100 * ++i // total) + "% generated")
+            return x
+
+
         generated = map(model.forward, iter(dataloader))
-        generated = map(lambda x: prog_callback(++i, total, x), generated)
+        generated = map(prog_callback, generated)
         generated = list(generated)
         generated = mu_law_expansion(generated, model.classes)
 
@@ -83,7 +88,3 @@ for in_file in input_files:
         print(out_path, generated)
 
         lr.output.write_wav(out_path, generated, sr=SR)
-
-def prog_callback(step, total_steps, _):
-    print(str(100 * step // total_steps) + "% generated")
-    return _
