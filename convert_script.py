@@ -2,6 +2,8 @@ from umt_model import *
 from UmtDataset import *
 import librosa
 from wavenet_model import *
+import itertools
+
 from audio_data import WavenetDataset
 from wavenet_training import *
 
@@ -79,8 +81,8 @@ for in_file in input_files:
             return x
 
         generated = map(model.forward, iter(dataloader))
-        generated = map(prog_callback, generated[:total])
-        generated = list(generated)
+        generated = map(prog_callback, generated)
+        generated = list(itertools.islice(generated, total))
         generated = mu_law_expansion(generated, model.classes)
 
         out_path = GENERATION_OUTPUTS + filename + \
