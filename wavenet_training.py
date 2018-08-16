@@ -21,8 +21,8 @@ def print_last_validation_result(opt):
 
 
 NUM_GPU = 4
-# os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
-#     1:-1].replace(" ", "")
+os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
+    1:-1].replace(" ", "")
 
 
 class WavenetTrainer:
