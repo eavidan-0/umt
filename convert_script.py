@@ -70,7 +70,8 @@ for in_file in input_files:
         #                                 regularize=0.)
 
         generated = map(model.forward, iter(dataloader))
-        generated = mu_law_expansion(list(generated), model.classes)
+        generated = list(generated)
+        generated = mu_law_expansion(generated, model.classes)
 
         out_path = GENERATION_OUTPUTS + filename + \
             '.' + DOMAINS[domain_index] + '.wav'
