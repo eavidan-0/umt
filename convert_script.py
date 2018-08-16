@@ -85,8 +85,11 @@ for in_file in input_files:
         # generated = map(prog_callback, generated)
         generated = map(lambda v: (Variable(v).data).cpu().numpy(), generated)
         generated = list(itertools.islice(generated, total))
-        generated = sum(generated, [])
+        # generated = sum(generated, [])
         # generated = mu_law_expansion(generated, model.classes)
+
+        # TODO: convert data to signal...
+        print (generated)
 
         out_path = GENERATION_OUTPUTS + filename + \
             '.' + DOMAINS[domain_index] + '.wav'
