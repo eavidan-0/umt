@@ -83,7 +83,9 @@ for in_file in input_files:
 
         generated = map(model.forward, iter(dataloader))
         # generated = map(prog_callback, generated)
+        generated = map(lambda v: (Variable(v).data).cpu().numpy(), generated)
         generated = list(itertools.islice(generated, total))
+        generated = sum(generated, [])
         # generated = mu_law_expansion(generated, model.classes)
 
         out_path = GENERATION_OUTPUTS + filename + \
