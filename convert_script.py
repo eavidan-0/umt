@@ -55,7 +55,6 @@ def convert_output_to_signal(x):
     # Compute SM bucket for second
     x = np.apply_along_axis(lambda p: np.random.choice(
         model.classes, p=p), 1, np_prob)
-    print(x.shape)
     return x
 
 
@@ -100,19 +99,14 @@ for in_file in input_files:
         # generated = map(prog_callback, generated)
         generated = map(convert_output_to_signal, generated)
         generated = list(itertools.islice(generated, total))
-        print (generated, generated[0])
-
         generated = np.concatenate(generated)
-        print (generated)
 
         # convert data to signal...
         generated = (generated / model.classes) * 2. - 1
         generated = mu_law_expansion(generated, model.classes)
 
-        print (generated)
-
-        out_path = GENERATION_OUTPUTS + filename + \
+        out_path = GENERATION_OUTPUTS + "/" + filename + \
             '.' + DOMAINS[domain_index] + '.wav'
-        print(out_path, generated)
+        print(out_path)
 
         lr.output.write_wav(out_path, generated, sr=SR)
