@@ -106,7 +106,7 @@ for in_file in input_files:
         generated = mu_law_expansion(generated, model.classes)
 
         out_path = GENERATION_OUTPUTS + "/" + filename + \
-            '.' + DOMAINS[domain_index] + '.wav'
+            '.' + DOMAINS[domain_index].replace(" ", "") + '.wav'
         print(out_path)
 
         lr.output.write_wav(out_path, generated, sr=SR)
