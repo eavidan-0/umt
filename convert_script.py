@@ -74,9 +74,8 @@ for in_file in input_files:
         print (total, "samples")
 
         def prog_callback(x):
-            print(str(100 * ++i // total) + "% generated")
+            print(str(100.0 * ++i / total) + "% generated")
             return x
-
 
         generated = map(model.forward, iter(dataloader))
         generated = map(prog_callback, generated)
@@ -87,4 +86,4 @@ for in_file in input_files:
             '.' + DOMAINS[domain_index] + '.wav'
         print(out_path, generated)
 
-        lr.output.write_wav(out_path, generated, sr=SR)
+        lr.output.write_wav(out_path, generated, sr=SR)0
