@@ -54,7 +54,7 @@ def convert_output_to_signal(x):
 
     # Compute SM bucket for second
     x = np.apply_along_axis(lambda p: np.random.choice(
-        model.classes, p=p), 0, np_prob)
+        model.classes, p=p), 1, np_prob)
     print(x.shape)
     return x
 
