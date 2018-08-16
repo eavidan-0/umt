@@ -100,7 +100,7 @@ for in_file in input_files:
         # generated = map(prog_callback, generated)
         generated = map(convert_output_to_signal, generated)
         generated = itertools.islice(generated, total)
-        generated = sum(generated, [])
+        generated = np.concatenate(generated)
         print (generated)
 
         # convert data to signal...
