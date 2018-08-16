@@ -44,6 +44,17 @@ except OSError:
     pass
 
 input_files = list_all_audio_files(GENERATION_INPUTS)
+
+
+def convert_output_to_signal(x):
+    x = (Variable(x).data).cpu()
+    prob = F.softmax(x, dim=0)
+    prob = prob.cpu()
+    np_prob = prob.data.numpy()
+    x = np.random.choice(self.classes, p=np_prob)
+    return x
+
+
 for in_file in input_files:
     filename = os.path.splitext(os.path.basename(in_file))[0]
     print(filename)
@@ -83,13 +94,13 @@ for in_file in input_files:
 
         generated = map(model.forward, iter(dataloader))
         # generated = map(prog_callback, generated)
-        generated = map(lambda v: (Variable(v).data).cpu().numpy(), generated)
         generated = list(itertools.islice(generated, total))
-        # generated = sum(generated, [])
+        generated = map(convert_output_to_signal, generated)
+        generated = sum(generated, [])
         # generated = mu_law_expansion(generated, model.classes)
 
         # TODO: convert data to signal...
-        print (generated[0])
+        print (generated)
 
         out_path = GENERATION_OUTPUTS + filename + \
             '.' + DOMAINS[domain_index] + '.wav'
