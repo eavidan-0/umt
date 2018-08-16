@@ -76,13 +76,12 @@ for in_file in input_files:
         total = 30
         print (total, "samples")
 
-        def prog_callback(x):
-            i += 1
+        def prog_callback(i, x):
             print(str(100.0 * i / total) + "% generated")
             return x
 
         generated = map(model.forward, iter(dataloader))
-        generated = map(prog_callback, generated)
+        generated = map(lambda x: prog_callback(i += 1, x), generated)
         generated = list(itertools.islice(generated, total))
         # generated = mu_law_expansion(generated, model.classes)
 
