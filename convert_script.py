@@ -47,7 +47,7 @@ input_files = list_all_audio_files(GENERATION_INPUTS)
 
 
 def convert_output_to_signal(x):
-    x = (Variable(x).data).cpu()
+    x = (Variable(x.squeeze()).data).cpu()
     prob = F.softmax(x, dim=0)
     prob = prob.cpu()
     np_prob = prob.data.numpy()
