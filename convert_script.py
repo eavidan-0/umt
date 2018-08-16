@@ -78,8 +78,8 @@ for in_file in input_files:
             print(str(100.0 * ++i / total) + "% generated")
             return x
 
-        generated = map(model.forward, iter(dataloader[:total]))
-        generated = map(prog_callback, generated)
+        generated = map(model.forward, iter(dataloader))
+        generated = map(prog_callback, generated[:total])
         generated = list(generated)
         generated = mu_law_expansion(generated, model.classes)
 
