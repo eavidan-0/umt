@@ -89,7 +89,7 @@ for in_file in input_files:
         # generated = mu_law_expansion(generated, model.classes)
 
         # TODO: convert data to signal...
-        print (generated)
+        print (generated[0])
 
         out_path = GENERATION_OUTPUTS + filename + \
             '.' + DOMAINS[domain_index] + '.wav'
