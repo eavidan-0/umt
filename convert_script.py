@@ -50,7 +50,7 @@ def convert_output_to_signal(x):
     x = x.squeeze().transpose(0, 1)
     prob = F.softmax(x, dim=1)  # map seconds to buckets
     prob = prob.cpu()
-    np_prob = prob.data.numpy()size
+    np_prob = prob.data.numpy()
 
     # Compute SM bucket for second
     x = map(lambda p: np.random.choice(model.classes, p=p), np_prob)
