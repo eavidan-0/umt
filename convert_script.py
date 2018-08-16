@@ -51,6 +51,7 @@ def convert_output_to_signal(x):
     prob = F.softmax(x, dim=0)
     prob = prob.cpu()
     np_prob = prob.data.numpy()
+    print (x.size(), np_prob.shape)
     x = np.random.choice(model.classes, p=np_prob)
     return x
 
