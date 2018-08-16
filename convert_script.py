@@ -53,8 +53,8 @@ def convert_output_to_signal(x):
     np_prob = prob.data.numpy()
 
     # Compute SM bucket for second
-    x = map(lambda p: np.random.choice(model.classes, p=p), np_prob)
-    x = np.array(x)
+    x = np.apply_along_axis(lambda p: np.random.choice(
+        model.classes, p=p), 0, np_prob)
     print(x.shape)
     return x
 
