@@ -77,13 +77,14 @@ for in_file in input_files:
         print (total, "samples")
 
         def prog_callback(x):
-            print(str(100.0 * ++i / total) + "% generated")
+            i += 1
+            print(str(100.0 * i / total) + "% generated")
             return x
 
         generated = map(model.forward, iter(dataloader))
         generated = map(prog_callback, generated)
         generated = list(itertools.islice(generated, total))
-        generated = mu_law_expansion(generated, model.classes)
+        # generated = mu_law_expansion(generated, model.classes)
 
         out_path = GENERATION_OUTPUTS + filename + \
             '.' + DOMAINS[domain_index] + '.wav'
