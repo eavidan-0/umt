@@ -149,13 +149,13 @@ class WaveNetModel(nn.Module):
         x = self.wavenet(input)
 
         # reshape output
-        # [n, c, l] = x.size()
-        # l = self.output_length
-        # x = x[:, :, -l:]
+        [n, c, l] = x.size()
+        l = self.output_length
+        x = x[:, :, -l:]
         # x = x.transpose(1, 2).contiguous()
         # x = x.view(n * l, c)
 
-        x = Variable(self.convert_output_to_signal(x)).squeeze()
+        x = torch.from_numpy(self.convert_output_to_signal(x)).squeeze()
         return x
 
     def generate(self,
@@ -317,19 +317,13 @@ class WaveNetModel(nn.Module):
         x = x.squeeze()
         dim = x.dim()
 
-        print ("dim", dim, x.size())
         x = x.transpose(dim - 2, dim - 1)
-        print ("dim", dim, x.size())
         prob = F.softmax(x, dim=dim - 1)  # map seconds to buckets
         prob = prob.cpu()
         np_prob = prob.data.numpy()
 
-        print (prob.size())
-
         # Compute SM bucket for second
         x = np.apply_along_axis(self._distribute, dim - 1, np_prob)
-        print (x.shape)
-
         return x
 
     def _distribute(self ,p):
