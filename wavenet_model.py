@@ -155,7 +155,7 @@ class WaveNetModel(nn.Module):
         # x = x.transpose(1, 2).contiguous()
         # x = x.view(n * l, c)
 
-        x = torch.from_numpy(self.convert_output_to_signal(x)).squeeze()
+        x = torch.from_numpy(self.convert_output_to_signal(x))
         return x
 
     def generate(self,
