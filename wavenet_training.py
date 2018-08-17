@@ -123,7 +123,6 @@ class WavenetTrainer:
                 original_latent = self.train_model.encode(data)
                 pred_domain = self.domain_classifier(original_latent)
 
-                print (pred_domain.size(), domain_index.size())
                 classifier_loss = F.cross_entropy(pred_domain, domain_index)
                 self.classifier_optimizer.zero_grad()
                 classifier_loss.backward()
