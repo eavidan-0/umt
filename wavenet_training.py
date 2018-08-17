@@ -48,8 +48,6 @@ class DomainClassifier(nn.Module):
                                 bias=bias)
 
     def forward(self, latent):
-        x = latent.cpu()
-
         x = self.conv_1(x)
         x = F.elu(x, alpha=1.0)
         x = self.conv_2(x)
@@ -88,6 +86,7 @@ class WavenetTrainer:
         if use_cuda:
             self.train_model = nn.parallel.DataParallel(
                 self.train_model, device_ids=list(range(NUM_GPU)))
+            self.domain_classifier = self.domain_classifier.cuda()
             self.encoder = nn.parallel.DataParallel(
                 self.encoder, device_ids=list(range(NUM_GPU)))
 
