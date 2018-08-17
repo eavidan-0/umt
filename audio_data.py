@@ -8,6 +8,8 @@ import numpy as np
 import librosa as lr
 import bisect
 
+from umt_model import *
+
 from random import random, randint
 
 
@@ -158,7 +160,10 @@ class WavenetDataset(torch.utils.data.Dataset):
             self.classes, self.target_length).zero_()
         one_hot_target.scatter_(0, target, 1.)
 
-        return self.domain_index, one_hot, target, one_hot_target
+        one_hot_domain_index = torch.FloatTensor(len(DOMAINS)).zero_()
+        one_hot_domain_index.scatter_(0, self.domain_index, 1.)
+
+        return self.domain_index, one_hot, target, one_hot_target, one_hot_domain_index
 
     def __len__(self):
         test_length = math.floor(self._length / self._test_stride)
