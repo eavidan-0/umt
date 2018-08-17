@@ -206,14 +206,15 @@ def mu_law_expansion(data, mu):
 
 
 def convert_output_to_signal(x, classes):
+    print (x.size())
+    raise OSError()
     x = x.squeeze()
     dim = x.dim()
     x = x.transpose(dim - 2, dim - 1)
 
-    # prob = F.softmax(x, dim=dim - 1)  # map seconds to buckets
-    # prob = prob.cpu()
-    # np_prob = prob.data.numpy()    # Compute SM bucket for second
-    np_prob = x.data.numpy()
+    prob = F.softmax(x, dim=dim - 1)  # map seconds to buckets
+    prob = prob.cpu()
+    np_prob = prob.data.numpy()    # Compute SM bucket for second
 
     x = np.apply_along_axis(
         lambda p: np.random.choice(classes, p=p), dim - 1, np_prob)
