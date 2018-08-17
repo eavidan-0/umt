@@ -39,7 +39,7 @@ class DomainClassifier(nn.Module):
                                 out_channels=classes,
                                 kernel_size=3,
                                 bias=bias)
-        
+
         self.conv_3 = nn.Conv1d(in_channels=classes,
                                 out_channels=len(DOMAINS),
                                 kernel_size=3,
@@ -129,7 +129,7 @@ class WavenetTrainer:
 
                 classifier_loss = F.cross_entropy(pred_domain, domain_index)
                 self.classifier_optimizer.zero_grad()
-                classifier_loss.backward()
+                classifier_loss.backward(retain_graph=True)
                 self.classifier_optimizer.step()
 
                 # Pass through network now
