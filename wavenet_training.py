@@ -109,12 +109,13 @@ class WavenetTrainer:
             print("epoch", current_epoch)
             tic = time.time()
             for data in iter(self.dataloader):
-                domain_index, x, target = data
+                domain_index, x, target, one_hot_target = data
 
                 domain_index = Variable(domain_index).squeeze()
                 x = Variable(x.type(self.dtype))
                 # target = Variable(target.view(-1).type(self.ltype))
                 target = Variable(target.type(self.ltype)).squeeze()
+                one_hot_target = Variable(one_hot_target.type(self.ltype)).squeeze()
 
                 # Pass through domain confusion model
                 original_latent = self.train_model.encode(data)
@@ -131,7 +132,7 @@ class WavenetTrainer:
                     original_latent)  # same latent!
 
                 classifier_loss = F.cross_entropy(pred_domain, domain_index)
-                model_loss = F.cross_entropy(output, target)
+                model_loss = F.cross_entropy(output, one_hot_target)
 
                 loss = model_loss - CONFUSION_LOSS_WEIGHT * classifier_loss
                 self.model_optimizer.zero_grad()

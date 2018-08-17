@@ -45,7 +45,7 @@ class UmtModel(nn.Module):
     def encode(self, input_tuple):
         torch.set_grad_enabled(self.is_training)
 
-        domain_index_tensor, input, _ = input_tuple
+        domain_index_tensor, input, _, __ = input_tuple
         domain_index = domain_index_tensor.data[0]
 
         assert domain_index < len(

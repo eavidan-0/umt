@@ -45,6 +45,21 @@ except OSError:
 
 input_files = list_all_audio_files(GENERATION_INPUTS)
 
+
+def convert_output_to_signal(x):
+    x = x.squeeze()
+    dim = x.dim()
+    x = x.transpose(dim - 2, dim - 1)
+
+    prob = F.softmax(x, dim=dim - 1)  # map seconds to buckets
+    prob = prob.cpu()
+    np_prob = prob.data.numpy()    # Compute SM bucket for second
+
+    x = np.apply_along_axis(
+        lambda p: np.random.choice(model.classes, p=p), dim - 1, np_prob)
+    return x
+
+
 for in_file in input_files:
     filename = os.path.splitext(os.path.basename(in_file))[0]
     print(filename)
@@ -84,7 +99,7 @@ for in_file in input_files:
 
         generated = map(model.forward, iter(dataloader))
         # generated = map(prog_callback, generated)
-        generated = map(lambda x: x.cpu().numpy(), generated)
+        generated = map(convert_output_to_signal, generated)
         generated = list(itertools.islice(generated, total))
         generated = np.concatenate(generated)
 

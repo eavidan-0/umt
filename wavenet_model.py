@@ -155,7 +155,6 @@ class WaveNetModel(nn.Module):
         # x = x.transpose(1, 2).contiguous()
         # x = x.view(n * l, c)
 
-        x = torch.from_numpy(self.convert_output_to_signal(x)).squeeze()
         return x
 
     def generate(self,
@@ -312,23 +311,6 @@ class WaveNetModel(nn.Module):
             c.cuda(device)
 
         super().cuda(device)
-
-    def convert_output_to_signal(self, x):
-        x = x.squeeze()
-        dim = x.dim()
-
-        x = x.transpose(dim - 2, dim - 1)
-        prob = F.softmax(x, dim=dim - 1)  # map seconds to buckets
-        prob = prob.cpu()
-        np_prob = prob.data.numpy()
-
-        # Compute SM bucket for second
-        x = np.apply_along_axis(
-            lambda p: self._distribute(p), dim - 1, np_prob)
-        return x
-
-    def _distribute(self, p):
-        return np.random.choice(self.classes, p=p)
 
 
 def load_latest_model_from(location, use_cuda=True):
