@@ -317,7 +317,9 @@ class WaveNetModel(nn.Module):
         x = x.squeeze()
         dim = len(x.size())
 
-        x = x.squeeze().transpose(dim - 2, dim - 1)
+        print ("dim", dim, x.size())
+        x = x.transpose(dim - 2, dim - 1)
+        print ("dim", dim, x.size())
         prob = F.softmax(x, dim=dim - 1)  # map seconds to buckets
         prob = prob.cpu()
         np_prob = prob.data.numpy()
