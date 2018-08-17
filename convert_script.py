@@ -68,9 +68,9 @@ for in_file in input_files:
                                  item_length=model.item_length,
                                  target_length=model.target_length,
                                  file_location=in_file,
-                                 train=False,
+                                 train=True,
                                  domain_index=domain_index,
-                                 test_stride=1)
+                                 test_stride=5000000)
 
         dataloader = torch.utils.data.DataLoader(dataset,
                                                  batch_size=1,
@@ -95,10 +95,10 @@ for in_file in input_files:
             print(str(100.0 * i / total) + "% generated")
             return x
 
-        generated = map(model.forward, iter(dataloader))
+        # generated = map(model.forward, iter(dataloader))
         # generated = map(prog_callback, generated)
-        generated = map(convert_output_to_signal, generated)
-        generated = list(itertools.islice(generated, total))
+        # generated = map(convert_output_to_signal, generated)
+        generated = list(itertools.islice(iter(dataloader), total))
         generated = np.concatenate(generated)
 
         # convert data to signal...

@@ -132,20 +132,22 @@ class WavenetDataset(torch.utils.data.Dataset):
         # TODO: this should have been before mu-law...
         if self.train:
             # Reverse quantization and encoding
-            y = (sample - self.classes / 2 + 1) / float(self.classes) * 2
+            y = (sample / self.classes) * 2. - 1
             y = mu_law_expansion(y, self.classes)
 
-            seg_length = int(self.sampling_rate * (random() * 0.25 + 0.25))  # 1/4 -> 1/2
+            seg_length = int(self.sampling_rate *
+                             (random() * 0.25 + 0.25))  # 1/4 -> 1/2
             s = randint(0, self.sampling_rate - seg_length)
             e = s + seg_length
 
             n_steps = random() - 0.5  # +- 0.5
-            shifted = lr.effects.pitch_shift(y[s:e], sr=self.sampling_rate, n_steps=n_steps)
+            shifted = lr.effects.pitch_shift(
+                y[s:e], sr=self.sampling_rate, n_steps=n_steps)
             y[s:e] = np.clip(shifted, -1, 1)
 
             # TODO: should I mU again?
             sample = quantize_data(y, self.classes, mu=True)
-            
+
         example = torch.from_numpy(sample).type(torch.LongTensor)
         input = example[:self._item_length].unsqueeze(0)
         target = example[-self.target_length:].unsqueeze(0)

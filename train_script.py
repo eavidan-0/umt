@@ -40,7 +40,7 @@ if use_cuda:
 data = UmtDataset(item_length=model.item_length,
                   target_length=model.target_length,
                   train=True,
-                  test_stride=500)
+                  test_stride=5000000)
 
 
 def generate_and_log_samples(step):
