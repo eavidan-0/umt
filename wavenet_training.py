@@ -130,7 +130,7 @@ class WavenetTrainer:
 
                 classifier_loss = F.cross_entropy(pred_domain, domain_index)
                 self.classifier_optimizer.zero_grad()
-                classifier_loss.backward()
+                classifier_loss.backward(retain_graph=True)
                 self.classifier_optimizer.step()
 
                 # Pass through network now
