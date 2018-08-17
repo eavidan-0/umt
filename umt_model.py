@@ -15,6 +15,7 @@ class UmtModel(nn.Module):
     def __init__(self, dtype, classes=256, train=True):
         super(UmtModel, self).__init__()
 
+        self.dtype = dtype
         self.classes = classes
         self.is_training = train
 
