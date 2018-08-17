@@ -145,7 +145,6 @@ class WavenetDataset(torch.utils.data.Dataset):
                 y[s:e], sr=self.sampling_rate, n_steps=n_steps)
             y[s:e] = np.clip(shifted, -1, 1)
 
-            # TODO: should I mU again?
             sample = quantize_data(y, self.classes, mu=True)
 
         example = torch.from_numpy(sample).type(torch.LongTensor)

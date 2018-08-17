@@ -21,6 +21,30 @@ def print_last_validation_result(opt):
 
 
 NUM_GPU = 4
+CONFUSION_LOSS_WEIGHT = 10 ** -2
+
+
+class DomainClassifier(nn.Module):
+    def __init__(self, bias=True):
+        super(DomainClassifier, self).__init__()
+
+        self.conv_1 = nn.Conv1d(in_channels=self.classes,
+                                out_channels=channels,
+                                kernel_size=1,
+                                bias=bias)
+
+    def forward(self, latent):
+        print(latent.size())
+        x = latent
+
+        x = self.conv_1(x)
+        x = F.elu(x, alpha=1.0)
+        x = self.conv_2(x)
+        x = F.elu(x, alpha=1.0)
+        x = self.conv_3(x)
+        x = F.elu(x, alpha=1.0)
+
+        return x
 
 
 class WavenetTrainer:
@@ -46,7 +70,10 @@ class WavenetTrainer:
         self.weight_decay = weight_decay
         self.clip = gradient_clipping
         self.optimizer_type = optimizer
-        self.optimizer = self.optimizer_type(
+        self.domain_classifier = DomainClassifier()
+        self.classifier_optimizer = self.optimizer_type(
+            params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+        self.model_optimizer = self.optimizer_type(
             params=self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.logger = logger
         self.logger.trainer = self
@@ -65,7 +92,7 @@ class WavenetTrainer:
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
                                                       #   shuffle=True,
-                                                      num_workers=0,  # num_workers=8,
+                                                      num_workers=2,  # num_workers=8,
                                                       pin_memory=False)
         step = continue_training_at_step
         for current_epoch in range(epochs):
@@ -74,21 +101,37 @@ class WavenetTrainer:
             for data in iter(self.dataloader):
                 domain_index, x, target = data
 
+                domain_index = Variable(domain_index).squeeze()
                 x = Variable(x.type(self.dtype))
                 # target = Variable(target.view(-1).type(self.ltype))
-                target = Variable(target.type(self.ltype))
+                target = Variable(target.type(self.ltype)).squeeze()
 
-                output = self.train_model(data)
+                # Pass through domain confusion model
+                original_latent = self.train_model.encode(data)
+                pred_domain = self.domain_classifier(original_latent)
 
-                loss = F.cross_entropy(output.squeeze(), target.squeeze())
-                self.optimizer.zero_grad()
+                classifier_loss = F.cross_entropy(pred_domain, domain_index)
+                self.classifier_optimizer.zero_grad()
+                classifier_loss.backward()
+                self.classifier_optimizer.step()
+
+                # Pass through network now
+                output = self.train_model(data).squeeze()
+                pred_domain = self.domain_classifier(
+                    original_latent)  # same latent!
+
+                classifier_loss = F.cross_entropy(pred_domain, domain_index)
+                model_loss = F.cross_entropy(output, target)
+
+                loss = model_loss - CONFUSION_LOSS_WEIGHT * classifier_loss
+                self.model_optimizer.zero_grad()
                 loss.backward()
                 loss = loss.item()
 
                 if self.clip is not None:
                     torch.nn.utils.clip_grad_norm(
                         self.train_model.parameters(), self.clip)
-                self.optimizer.step()
+                self.model_optimizer.step()
                 step += 1
 
                 # time step duration:

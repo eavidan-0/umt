@@ -51,7 +51,7 @@ class WaveNetModel(nn.Module):
         prev_dilation = 1
 
         self.dilated_convs = nn.ModuleList()
-        self.dilated_queues = []
+        # self.dilated_queues = []
         self.residual_convs = nn.ModuleList()
 
         # 1x1 convolution to create channels
@@ -74,10 +74,10 @@ class WaveNetModel(nn.Module):
                                                     bias=bias))
 
                 # dilated queues for fast generation
-                self.dilated_queues.append(DilatedQueue(max_length=(kernel_size - 1) * dilation + 1,
-                                                        num_channels=channels,
-                                                        dilation=dilation,
-                                                        dtype=dtype))
+                # self.dilated_queues.append(DilatedQueue(max_length=(kernel_size - 1) * dilation + 1,
+                #                                         num_channels=channels,
+                #                                         dilation=dilation,
+                #                                         dtype=dtype))
 
                 # 1x1 convolution for residual connection
                 self.residual_convs.append(nn.Conv1d(in_channels=channels,
@@ -128,9 +128,9 @@ class WaveNetModel(nn.Module):
             x = x + residual[:, :, start_idx:]
 
         # TODO: we need the next three lines? not in article..
-        x = F.relu(x)
-        x = self.end_conv_1(x)
-        x = F.relu(x)
+        # x = F.relu(x)
+        # x = self.end_conv_1(x)
+        # x = F.relu(x)
         x = self.end_conv_2(x)
 
         return x
@@ -286,8 +286,8 @@ class WaveNetModel(nn.Module):
 
     def cpu(self, type):
         self.dtype = type
-        for q in self.dilated_queues:
-            q.dtype = type
+        # for q in self.dilated_queues:
+        #     q.dtype = type
 
         for c in self.dilated_convs:
             c.cpu()
@@ -299,8 +299,8 @@ class WaveNetModel(nn.Module):
 
     def cuda(self, device, type):
         self.dtype = type
-        for q in self.dilated_queues:
-            q.dtype = type
+        # for q in self.dilated_queues:
+        #     q.dtype = type
 
         for c in self.dilated_convs:
             c.cuda(device)
