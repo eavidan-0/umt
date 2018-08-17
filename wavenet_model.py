@@ -328,6 +328,8 @@ class WaveNetModel(nn.Module):
 
         # Compute SM bucket for second
         x = np.apply_along_axis(self._distribute, dim - 1, np_prob)
+        print (x.size())
+
         return x
 
     def _distribute(self ,p):
