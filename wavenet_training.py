@@ -134,10 +134,6 @@ class WavenetTrainer:
 
                 # Pass through network now
                 output = self.train_model(data).squeeze()
-                pred_domain = self.domain_classifier(
-                    original_latent)  # same latent!
-
-                classifier_loss = F.cross_entropy(pred_domain, domain_index)
                 model_loss = F.cross_entropy(output, target)
 
                 loss = model_loss - CONFUSION_LOSS_WEIGHT * classifier_loss
