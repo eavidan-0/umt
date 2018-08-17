@@ -315,7 +315,7 @@ class WaveNetModel(nn.Module):
 
     def convert_output_to_signal(self, x):
         x = x.squeeze()
-        dim = len(x.size())
+        dim = len(x.size().data)
 
         print ("dim", dim, x.size())
         x = x.transpose(dim - 2, dim - 1)
