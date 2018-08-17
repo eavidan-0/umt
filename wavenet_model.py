@@ -327,10 +327,11 @@ class WaveNetModel(nn.Module):
         print (prob.size())
 
         # Compute SM bucket for second
-        x = np.apply_along_axis(lambda p: np.random.choice(
-            self.classes, p=p), 1, np_prob)
+        x = np.apply_along_axis(self._distribute, dim - 1, np_prob)
         return x
 
+    def _distribute(self ,p):
+        return np.random.choice(self.classes, p=p)
 
 def load_latest_model_from(location, use_cuda=True):
     files = [location + "/" + f for f in os.listdir(location)]
