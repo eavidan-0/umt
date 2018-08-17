@@ -58,7 +58,7 @@ class UmtModel(nn.Module):
         return latent
 
     def forward(self, input_tuple):
-        domain_index_tensor, input, _, __ = input_tuple
+        domain_index_tensor, input, _ = input_tuple
         domain_index = domain_index_tensor.data[0]
         
         latent = self.encode(input_tuple)
