@@ -49,7 +49,7 @@ class DomainClassifier(nn.Module):
 
     def forward(self, latent):
         x = latent
-        
+
         x = self.conv_1(x)
         x = F.elu(x, alpha=1.0)
         x = self.conv_2(x)
@@ -125,9 +125,9 @@ class WavenetTrainer:
                 x = Variable(x.type(self.dtype))
                 # target = Variable(target.view(-1).type(self.ltype))
                 target = Variable(target.type(self.ltype)).squeeze()
-                domain_index_conv = Variable(domain_index.type(self.ltype))
+                domain_index = Variable(domain_index.type(self.ltype))
 
-                data = (domain_index_conv, x, target)
+                data = (domain_index, x, target)
 
                 # Pass through domain confusion model
                 original_latent = self.post_encode(self.encoder(x))
