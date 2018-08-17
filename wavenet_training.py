@@ -129,7 +129,7 @@ class WavenetTrainer:
                 data = (domain_index_conv, x, target)
 
                 # Pass through domain confusion model
-                original_latent = self.post_encode(self.encoder(data))
+                original_latent = self.post_encode(self.encoder(x))
                 pred_domain = self.domain_classifier(original_latent)
 
                 classifier_loss = F.cross_entropy(pred_domain, domain_index)
