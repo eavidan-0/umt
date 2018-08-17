@@ -46,7 +46,6 @@ class DomainClassifier(nn.Module):
                                 bias=bias)
 
     def forward(self, latent):
-        print(latent.size())
         x = latent
 
         x = self.conv_1(x)
@@ -56,11 +55,8 @@ class DomainClassifier(nn.Module):
         x = self.conv_3(x)
         x = F.elu(x, alpha=1.0)
 
-        print (x.size())
         x = F.avg_pool1d(x, kernel_size=x.size()[2])
-        print (x.size())
-        raise OSError()
-        return x
+        return x.squeeze()
 
 
 class WavenetTrainer:
