@@ -154,7 +154,8 @@ class WavenetDataset(torch.utils.data.Dataset):
         one_hot = torch.FloatTensor(self.classes, self._item_length).zero_()
         one_hot.scatter_(0, input, 1.)
 
-        one_hot_target = torch.FloatTensor(self.classes, self.target_length).zero_()
+        one_hot_target = torch.FloatTensor(
+            self.classes, self.target_length).zero_()
         one_hot_target.scatter_(0, target, 1.)
 
         return self.domain_index, one_hot, target, one_hot_target
@@ -203,3 +204,17 @@ def mu_law_encoding(data, mu):
 def mu_law_expansion(data, mu):
     s = np.sign(data) * (np.exp(np.abs(data) * np.log(mu + 1)) - 1) / mu
     return s
+
+
+def convert_output_to_signal(x, classes):
+    x = x.squeeze()
+    dim = x.dim()
+    x = x.transpose(dim - 2, dim - 1)
+
+    prob = F.softmax(x, dim=dim - 1)  # map seconds to buckets
+    prob = prob.cpu()
+    np_prob = prob.data.numpy()    # Compute SM bucket for second
+
+    x = np.apply_along_axis(
+        lambda p: np.random.choice(classes, p=p), dim - 1, np_prob)
+    return x

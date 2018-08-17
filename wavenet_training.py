@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from model_logging import Logger
 from wavenet_modules import *
 from umt_model import *
+from audio_data import *
 
 use_cuda = torch.cuda.is_available()
 
@@ -28,8 +29,9 @@ CONFUSION_LOSS_WEIGHT = 10 ** -2
 class DomainClassifier(nn.Module):
     def __init__(self, classes, bias=True):
         super(DomainClassifier, self).__init__()
+        self.classes = classes
 
-        self.conv_1 = nn.Conv1d(in_channels=256,
+        self.conv_1 = nn.Conv1d(in_channels=classes,
                                 out_channels=128,
                                 kernel_size=1,
                                 bias=bias)
@@ -38,7 +40,7 @@ class DomainClassifier(nn.Module):
                                 out_channels=128,
                                 kernel_size=1,
                                 bias=bias)
-        
+
         self.conv_3 = nn.Conv1d(in_channels=128,
                                 out_channels=ENC_LEN,
                                 kernel_size=1,
@@ -46,7 +48,9 @@ class DomainClassifier(nn.Module):
 
     def forward(self, latent):
         print(latent.size())
-        x = latent
+        x = convert_output_to_signal(latent, self.classes)
+        x = torch.from_numpy(x)
+        print (x.size())
 
         x = self.conv_1(x)
         x = F.elu(x, alpha=1.0)
@@ -117,7 +121,8 @@ class WavenetTrainer:
                 x = Variable(x.type(self.dtype))
                 # target = Variable(target.view(-1).type(self.ltype))
                 target = Variable(target.type(self.ltype)).squeeze()
-                one_hot_target = Variable(one_hot_target.type(self.ltype)).squeeze()
+                one_hot_target = Variable(
+                    one_hot_target.type(self.ltype)).squeeze()
 
                 # Pass through domain confusion model
                 original_latent = self.train_model.encode(data)
