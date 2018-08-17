@@ -29,18 +29,19 @@ class DomainClassifier(nn.Module):
     def __init__(self, classes, bias=True):
         super(DomainClassifier, self).__init__()
         self.classes = classes
+        channels = classes / 8
 
-        self.conv_1 = nn.Conv1d(in_channels=classes,
-                                out_channels=classes,
+        self.conv_1 = nn.Conv1d(in_channels=channels,
+                                out_channels=channels,
                                 kernel_size=3,
                                 bias=bias)
 
-        self.conv_2 = nn.Conv1d(in_channels=classes,
-                                out_channels=classes,
+        self.conv_2 = nn.Conv1d(in_channels=channels,
+                                out_channels=channels,
                                 kernel_size=3,
                                 bias=bias)
         
-        self.conv_3 = nn.Conv1d(in_channels=classes,
+        self.conv_3 = nn.Conv1d(in_channels=channels,
                                 out_channels=len(DOMAINS),
                                 kernel_size=3,
                                 bias=bias)
@@ -133,11 +134,6 @@ class WavenetTrainer:
                 self.classifier_optimizer.step()
 
                 # Pass through network now
-                original_latent = self.model.encode(data)
-                pred_domain = self.domain_classifier(original_latent)
-
-                classifier_loss = F.cross_entropy(pred_domain, domain_index)
-                
                 output = self.train_model(data).squeeze()
                 model_loss = F.cross_entropy(output, target)
 
