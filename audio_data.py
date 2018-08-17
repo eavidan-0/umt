@@ -154,7 +154,7 @@ class WavenetDataset(torch.utils.data.Dataset):
         one_hot = torch.FloatTensor(self.classes, self._item_length).zero_()
         one_hot.scatter_(0, input, 1.)
 
-        one_hot_target = torch.FloatTensor(self.classes, self._target_length).zero_()
+        one_hot_target = torch.FloatTensor(self.classes, self.target_length).zero_()
         one_hot_target.scatter_(0, target, 1.)
 
         return self.domain_index, one_hot, target, one_hot_target
