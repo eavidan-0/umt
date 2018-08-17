@@ -121,6 +121,8 @@ class WavenetTrainer:
                 target = Variable(target.type(self.ltype)).squeeze()
                 domain_index = Variable(domain_index.type(self.ltype))
 
+                data = (domain_index, x, target)
+
                 # Pass through domain confusion model
                 original_latent = self.model.encode(data)
                 pred_domain = self.domain_classifier(original_latent)
@@ -135,6 +137,7 @@ class WavenetTrainer:
                 pred_domain = self.domain_classifier(original_latent)
 
                 classifier_loss = F.cross_entropy(pred_domain, domain_index)
+                
                 output = self.train_model(data).squeeze()
                 model_loss = F.cross_entropy(output, target)
 
