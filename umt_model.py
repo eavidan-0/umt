@@ -4,8 +4,6 @@ import torch
 import torch.nn.functional as F
 import librosa as lr
 
-DOMAINS = ["Ed Sheeran", "Metallica"]
-
 ENC_LEN = 64
 POOL_KERNEL = 50
 SR = 16000

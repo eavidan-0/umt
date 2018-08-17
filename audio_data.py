@@ -8,9 +8,9 @@ import numpy as np
 import librosa as lr
 import bisect
 
-from umt_model import *
-
 from random import random, randint
+
+DOMAINS = ["Ed Sheeran", "Metallica"]
 
 
 class WavenetDataset(torch.utils.data.Dataset):
