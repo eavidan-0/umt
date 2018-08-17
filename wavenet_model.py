@@ -148,11 +148,13 @@ class WaveNetModel(nn.Module):
         x = self.wavenet(input)
 
         # reshape output
-        [n, c, l] = x.size()
-        l = self.output_length
-        x = x[:, :, -l:]
+        # [n, c, l] = x.size()
+        # l = self.output_length
+        # x = x[:, :, -l:]
         # x = x.transpose(1, 2).contiguous()
         # x = x.view(n * l, c)
+
+        x = Variable(convert_output_to_signal(x)).squeeze()
         return x
 
     def generate(self,
@@ -328,3 +330,18 @@ def load_to_cpu(path):
     model = torch.load(path, map_location=lambda storage, loc: storage)
     model.cpu()
     return model
+
+
+def convert_output_to_signal(x):
+    x = x.squeeze()
+    dim = len(x.size())
+
+    x = x.squeeze().transpose(dim - 2, dim - 1)
+    prob = F.softmax(x, dim=1)  # map seconds to buckets
+    prob = prob.cpu()
+    np_prob = prob.data.numpy()
+
+    # Compute SM bucket for second
+    x = np.apply_along_axis(lambda p: np.random.choice(
+        model.classes, p=p), 1, np_prob)
+    return x
