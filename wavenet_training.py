@@ -32,7 +32,7 @@ class DomainClassifier(nn.Module):
         self.classes = classes
         channels = classes // 8
 
-        self.conv_1 = nn.Conv1d(in_channels=channels,
+        self.conv_1 = nn.Conv1d(in_channels=classes,
                                 out_channels=channels,
                                 kernel_size=3,
                                 bias=bias)
