@@ -53,8 +53,13 @@ class UmtModel(nn.Module):
 
         # Run through encoder
         enc = self.encoder.forward(input)
-        latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
+        return self.post_encode(enc)
 
+    def get_encoder(self):
+        return self.encoder, lambda enc: self.post_encode(enc)
+
+    def post_encode(self, enc):
+        latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
         return latent
 
     def forward(self, input_tuple):

@@ -28,7 +28,7 @@ CONFUSION_LOSS_WEIGHT = 10 ** -2
 class DomainClassifier(nn.Module):
     def __init__(self, classes, bias=True):
         super(DomainClassifier, self).__init__()
-        
+
         self.classes = classes
         channels = classes // 8
 
@@ -41,7 +41,7 @@ class DomainClassifier(nn.Module):
                                 out_channels=channels,
                                 kernel_size=3,
                                 bias=bias)
-        
+
         self.conv_3 = nn.Conv1d(in_channels=channels,
                                 out_channels=len(DOMAINS),
                                 kernel_size=3,
@@ -76,8 +76,7 @@ class WavenetTrainer:
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
         self.model = model
-        self.train_model = model if not use_cuda else nn.parallel.DataParallel(
-            model, device_ids=list(range(NUM_GPU)))
+        self.train_model = model
         self.dataset = dataset
         self.dataloader = None
         self.lr = lr
@@ -85,6 +84,12 @@ class WavenetTrainer:
         self.clip = gradient_clipping
         self.optimizer_type = optimizer
         self.domain_classifier = DomainClassifier(classes=model.classes)
+        self.encoder, self.post_encode = model.get_encoder()
+        if use_cuda:
+            self.train_model = nn.parallel.DataParallel(
+                self.train_model, device_ids=list(range(NUM_GPU)))
+            self.encoder = nn.parallel.DataParallel(
+                self.encoder, device_ids=list(range(NUM_GPU)))
 
         self.classifier_optimizer = self.optimizer_type(
             params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
@@ -124,7 +129,7 @@ class WavenetTrainer:
                 data = (domain_index_conv, x, target)
 
                 # Pass through domain confusion model
-                original_latent = self.model.encode(data)
+                original_latent = self.post_encode(self.encoder(data))
                 pred_domain = self.domain_classifier(original_latent)
 
                 classifier_loss = F.cross_entropy(pred_domain, domain_index)
