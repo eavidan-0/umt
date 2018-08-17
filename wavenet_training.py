@@ -82,7 +82,7 @@ class WavenetTrainer:
         self.weight_decay = weight_decay
         self.clip = gradient_clipping
         self.optimizer_type = optimizer
-        self.domain_classifier = DomainClassifier()
+        self.domain_classifier = DomainClassifier(classes=model.classes)
         self.classifier_optimizer = self.optimizer_type(
             params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.model_optimizer = self.optimizer_type(
