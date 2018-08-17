@@ -119,9 +119,9 @@ class WavenetTrainer:
                 x = Variable(x.type(self.dtype))
                 # target = Variable(target.view(-1).type(self.ltype))
                 target = Variable(target.type(self.ltype)).squeeze()
-                domain_index = Variable(domain_index.type(self.ltype))
+                # domain_index = Variable(domain_index.type(self.ltype))
 
-                data = (domain_index, x, target)
+                # data = (domain_index, x, target)
 
                 # Pass through domain confusion model
                 original_latent = self.model.encode(data)
