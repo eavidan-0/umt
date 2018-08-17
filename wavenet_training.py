@@ -28,8 +28,18 @@ class DomainClassifier(nn.Module):
     def __init__(self, bias=True):
         super(DomainClassifier, self).__init__()
 
-        self.conv_1 = nn.Conv1d(in_channels=self.classes,
-                                out_channels=channels,
+        self.conv_1 = nn.Conv1d(in_channels=1,
+                                out_channels=1,
+                                kernel_size=1,
+                                bias=bias)
+
+        self.conv_2 = nn.Conv1d(in_channels=1,
+                                out_channels=1,
+                                kernel_size=1,
+                                bias=bias)
+        
+        self.conv_3 = nn.Conv1d(in_channels=1,
+                                out_channels=1,
                                 kernel_size=1,
                                 bias=bias)
 
