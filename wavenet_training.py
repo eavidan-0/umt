@@ -106,7 +106,7 @@ class WavenetTrainer:
 
     def train(self,
               batch_size,
-              epochs=100,
+              epochs=1000,
               continue_training_at_step=0):
         self.train_model.train()
         print("dataset length is", len(self.dataset))
