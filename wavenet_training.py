@@ -48,7 +48,7 @@ class DomainClassifier(nn.Module):
                                 bias=bias)
 
     def forward(self, latent):
-        x = latent
+        x = latent.cpu()
 
         x = self.conv_1(x)
         x = F.elu(x, alpha=1.0)
@@ -85,8 +85,6 @@ class WavenetTrainer:
         self.clip = gradient_clipping
         self.optimizer_type = optimizer
         self.domain_classifier = DomainClassifier(classes=model.classes)
-        if use_cuda:
-            self.domain_classifier = self.domain_classifier.cuda()
 
         self.classifier_optimizer = self.optimizer_type(
             params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
