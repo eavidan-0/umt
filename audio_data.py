@@ -206,8 +206,6 @@ def mu_law_expansion(data, mu):
 
 
 def convert_output_to_signal(x, classes):
-    print (x.size())
-    raise OSError()
     x = x.squeeze()
     dim = x.dim()
     x = x.transpose(dim - 2, dim - 1)
