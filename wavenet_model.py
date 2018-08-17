@@ -317,9 +317,11 @@ class WaveNetModel(nn.Module):
         dim = len(x.size())
 
         x = x.squeeze().transpose(dim - 2, dim - 1)
-        prob = F.softmax(x, dim=1)  # map seconds to buckets
+        prob = F.softmax(x, dim=dim)  # map seconds to buckets
         prob = prob.cpu()
         np_prob = prob.data.numpy()
+
+        print (prob.size())
 
         # Compute SM bucket for second
         x = np.apply_along_axis(lambda p: np.random.choice(
