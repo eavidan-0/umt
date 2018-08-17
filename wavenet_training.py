@@ -28,8 +28,9 @@ CONFUSION_LOSS_WEIGHT = 10 ** -2
 class DomainClassifier(nn.Module):
     def __init__(self, classes, bias=True):
         super(DomainClassifier, self).__init__()
+        
         self.classes = classes
-        channels = classes / 8
+        channels = classes // 8
 
         self.conv_1 = nn.Conv1d(in_channels=channels,
                                 out_channels=channels,
