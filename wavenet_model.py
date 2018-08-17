@@ -4,7 +4,7 @@ import time
 from wavenet_modules import *
 from audio_data import *
 import math
-
+import numpy as np
 
 class WaveNetModel(nn.Module):
     """
@@ -154,7 +154,7 @@ class WaveNetModel(nn.Module):
         # x = x.transpose(1, 2).contiguous()
         # x = x.view(n * l, c)
 
-        x = Variable(convert_output_to_signal(x)).squeeze()
+        x = Variable(self.convert_output_to_signal(x)).squeeze()
         return x
 
     def generate(self,
@@ -312,6 +312,20 @@ class WaveNetModel(nn.Module):
 
         super().cuda(device)
 
+    def convert_output_to_signal(self, x):
+        x = x.squeeze()
+        dim = len(x.size())
+
+        x = x.squeeze().transpose(dim - 2, dim - 1)
+        prob = F.softmax(x, dim=1)  # map seconds to buckets
+        prob = prob.cpu()
+        np_prob = prob.data.numpy()
+
+        # Compute SM bucket for second
+        x = np.apply_along_axis(lambda p: np.random.choice(
+            self.classes, p=p), 1, np_prob)
+        return x
+
 
 def load_latest_model_from(location, use_cuda=True):
     files = [location + "/" + f for f in os.listdir(location)]
@@ -330,18 +344,3 @@ def load_to_cpu(path):
     model = torch.load(path, map_location=lambda storage, loc: storage)
     model.cpu()
     return model
-
-
-def convert_output_to_signal(x):
-    x = x.squeeze()
-    dim = len(x.size())
-
-    x = x.squeeze().transpose(dim - 2, dim - 1)
-    prob = F.softmax(x, dim=1)  # map seconds to buckets
-    prob = prob.cpu()
-    np_prob = prob.data.numpy()
-
-    # Compute SM bucket for second
-    x = np.apply_along_axis(lambda p: np.random.choice(
-        model.classes, p=p), 1, np_prob)
-    return x
