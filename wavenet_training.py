@@ -57,7 +57,7 @@ class DomainClassifier(nn.Module):
         x = F.elu(x, alpha=1.0)
 
         print (x.size())
-        x = F.avg_pool1d(x, kernel_size=ENC_LEN)
+        x = F.avg_pool1d(x, kernel_size=x.size()[2])
         print (x.size())
         raise OSError()
         return x
