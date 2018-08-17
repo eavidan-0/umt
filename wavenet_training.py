@@ -119,6 +119,8 @@ class WavenetTrainer:
                 one_hot_target = Variable(one_hot_target.type(self.ltype)).squeeze()
                 domain_index = Variable(domain_index.type(self.ltype))
 
+                data = (domain_index, x, target, one_hot_target)
+
                 # Pass through domain confusion model
                 original_latent = self.model.encode(data)
                 pred_domain = self.domain_classifier(original_latent)
