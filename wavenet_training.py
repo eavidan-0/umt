@@ -8,6 +8,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from model_logging import Logger
 from wavenet_modules import *
+from umt_model import *
 
 use_cuda = torch.cuda.is_available()
 
@@ -25,21 +26,21 @@ CONFUSION_LOSS_WEIGHT = 10 ** -2
 
 
 class DomainClassifier(nn.Module):
-    def __init__(self, bias=True):
+    def __init__(self, classes, bias=True):
         super(DomainClassifier, self).__init__()
 
-        self.conv_1 = nn.Conv1d(in_channels=1,
-                                out_channels=1,
+        self.conv_1 = nn.Conv1d(in_channels=256,
+                                out_channels=128,
                                 kernel_size=1,
                                 bias=bias)
 
-        self.conv_2 = nn.Conv1d(in_channels=1,
-                                out_channels=1,
+        self.conv_2 = nn.Conv1d(in_channels=128,
+                                out_channels=128,
                                 kernel_size=1,
                                 bias=bias)
         
-        self.conv_3 = nn.Conv1d(in_channels=1,
-                                out_channels=1,
+        self.conv_3 = nn.Conv1d(in_channels=128,
+                                out_channels=ENC_LEN,
                                 kernel_size=1,
                                 bias=bias)
 
@@ -54,6 +55,7 @@ class DomainClassifier(nn.Module):
         x = self.conv_3(x)
         x = F.elu(x, alpha=1.0)
 
+        print (x.size())
         return x
 
 
