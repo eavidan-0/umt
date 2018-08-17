@@ -48,6 +48,8 @@ class DomainClassifier(nn.Module):
                                 bias=bias)
 
     def forward(self, latent):
+        x = latent
+        
         x = self.conv_1(x)
         x = F.elu(x, alpha=1.0)
         x = self.conv_2(x)
