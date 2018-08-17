@@ -156,6 +156,7 @@ class WaveNetModel(nn.Module):
         # x = x.view(n * l, c)
 
         x = torch.from_numpy(self.convert_output_to_signal(x))
+        print(x.size())
         return x
 
     def generate(self,
