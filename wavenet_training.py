@@ -262,7 +262,7 @@ class MultiDomainRandomSampler(Sampler):
             domain_idx, idx), range_base)
 
         rand_range = randomize(d_range)
-        b_range = grouper(self.batch_size, rand_range))
+        b_range = grouper(self.batch_size, rand_range)
 
         return b_range
 
