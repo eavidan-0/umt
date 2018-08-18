@@ -253,7 +253,7 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
         domain_batches = itertools.chain(map(lambda idx: self._get_domain_range(idx), range(D)))
 
         # provides randomness between domains, in batches
-        return randomize(domain_ranges)
+        return randomize(domain_batches)
 
     def _get_domain_range(self, domain_idx):
         # provides randomness - inside the domain
