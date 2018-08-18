@@ -5,10 +5,12 @@ import torch
 import torch.nn.functional as F
 import librosa as lr
 
-# 12.5 downsample
-ENC_LEN = SR / 12.5
-POOL_KERNEL = SR / ENC_LEN
+DOWNSAMPLE_FACTOR = 12.5
+ENC_LEN = SR / DOWNSAMPLE_FACTOR
+if not ENC_LEN == int(ENC_LEN):
+    raise ValueError("SR not divisable") 
 
+ENC_LEN = int(ENC_LEN)
 
 class UmtModel(nn.Module):
     def __init__(self, dtype, classes=256, train=True):
@@ -20,7 +22,7 @@ class UmtModel(nn.Module):
 
         self.encoder = WaveNetModel(blocks=3,
                                     classes=self.classes,
-                                    output_length=ENC_LEN * POOL_KERNEL,
+                                    output_length=SR,
                                     dtype=dtype)
 
         decoders = [WaveNetModel(blocks=4,
@@ -58,7 +60,7 @@ class UmtModel(nn.Module):
         return self.encoder, lambda enc: self.post_encode(enc)
 
     def post_encode(self, enc):
-        latent = F.avg_pool1d(enc, kernel_size=POOL_KERNEL)
+        latent = F.avg_pool1d(enc, kernel_size=DOWNSAMPLE_FACTOR)
         return latent
 
     def forward(self, input_tuple):
