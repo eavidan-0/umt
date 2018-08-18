@@ -133,7 +133,7 @@ class WavenetTrainer:
 
         for current_epoch in range(start_epoch, epochs):
             print("epoch", current_epoch)
-            if current_epoch != 0:
+            if current_epoch > start_epoch:
                 self.decay_lr()
 
             tic = time.time()
@@ -256,9 +256,7 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
 
         # provides randomness between domains, in batches
         batches = randomize(all_batches)
-        for i in iter(batches):
-            print(i)
-            yield i
+        return iter(batches)
 
     def _get_domain_range(self, domain_idx):
         # provides randomness - inside the domain
