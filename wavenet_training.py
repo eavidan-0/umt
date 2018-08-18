@@ -161,7 +161,7 @@ class WavenetTrainer:
                 if step % 10 == 0:
                     toc = time.time()
                     print("step", step, "loss: ", loss,
-                          "conf_loss", classifier_loss)
+                          "conf_loss", classifier_loss.item())
 
                     tic = toc
 
