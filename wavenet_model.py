@@ -29,11 +29,11 @@ class WaveNetModel(nn.Module):
     """
 
     def __init__(self,
+                 blocks,
+                 classes,
+                 output_length,
                  layers=6,
-                 blocks=4,
                  channels=128,
-                 classes=256,
-                 output_length=32,
                  kernel_size=2,
                  dtype=torch.FloatTensor,
                  bias=True):

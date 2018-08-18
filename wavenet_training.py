@@ -160,8 +160,7 @@ class WavenetTrainer:
                 # time step duration:
                 if step % 10 == 0:
                     toc = time.time()
-                    print("step", step, "loss: ", loss, "one training step does take approximately " +
-                          str((toc - tic) * 0.1) + " seconds)")
+                    print("step", step, "loss: ")
 
                     tic = toc
 
@@ -182,6 +181,7 @@ class WavenetTrainer:
             return
 
         self.lr = self.lr * LR_DECAY
+        print ("DECAY LR", sample_ind)
 
         self.set_lr(self.classifier_optimizer)
         self.set_lr(self.model_optimizer)
