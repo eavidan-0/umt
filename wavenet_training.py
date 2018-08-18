@@ -25,7 +25,7 @@ def print_last_validation_result(opt):
 
 
 NUM_GPU = 4
-CONFUSION_LOSS_WEIGHT = 0.1  # they did 0.01
+CONFUSION_LOSS_WEIGHT = 0.05  # they did 0.01
 
 INIT_LR = 10 ** -3
 LR_DECAY = 0.98
@@ -176,13 +176,12 @@ class WavenetTrainer:
                         self.train_model.parameters(), self.clip)
                 self.model_optimizer.step()
                 step += 1
+                print("step %d: loss %.3f classifier_loss %.3f" %
+                      (step, loss, classifier_loss.item()))
 
                 # time step duration:
                 if step % 10 == 0:
                     toc = time.time()
-                    print("step", step, "loss: ", loss,
-                          "conf_loss", classifier_loss.item())
-
                     tic = toc
 
                 if step % self.snapshot_interval == 0:
