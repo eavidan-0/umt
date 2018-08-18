@@ -30,8 +30,8 @@ print ('item_length', model.item_length)
 print ('target_length', model.target_length)
 
 # reload snapshot
-continue_training_at_step = 0
-# model = load_latest_model_from('snapshots', use_cuda=use_cuda)
+start_epoch = 13
+model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
 if use_cuda:
     print("move model to gpu")
@@ -66,4 +66,4 @@ trainer = WavenetTrainer(model=model,
 
 print('start training...')
 trainer.train(batch_size=BATCH_SIZE,
-              continue_training_at_step=continue_training_at_step)
+              start_epoch=start_epoch)

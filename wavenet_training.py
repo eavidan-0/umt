@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from model_logging import Logger
 from wavenet_modules import *
 from umt_model import *
+from random import random
 
 use_cuda = torch.cuda.is_available()
 
@@ -26,7 +27,6 @@ CONFUSION_LOSS_WEIGHT = 0.05  # they did 0.01
 
 INIT_LR = 10 ** -3
 LR_DECAY = 0.98
-LR_DECAY_TIME = 5
 
 
 class DomainClassifier(nn.Module):
@@ -114,7 +114,7 @@ class WavenetTrainer:
     def train(self,
               batch_size,
               epochs=1000,
-              continue_training_at_step=0):
+              start_epoch=0):
         self.train_model.train()
         print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
@@ -122,14 +122,20 @@ class WavenetTrainer:
                                                       #   shuffle=True,
                                                       num_workers=2,  # num_workers=8,
                                                       pin_memory=False)
-        step = continue_training_at_step
-        for current_epoch in range(epochs):
+        step = start_epoch * len(self.dataset) / batch_size
+
+        # return to previous params
+        for _ in range(start_epoch):
+            self.decay_lr()
+
+        for current_epoch in range(start_epoch, epochs):
             print("epoch", current_epoch)
-            if current_epoch != 0 and current_epoch % LR_DECAY_TIME == 0:
+            if current_epoch != 0:
                 self.decay_lr()
 
             tic = time.time()
-            for data in iter(self.dataloader):
+            # Shuffle entire batches to ensure same domain index
+            for data in sorted(iter(self.dataloader), key=lambda k: random()):
                 domain_index, x, target = data
 
                 x = Variable(x.type(self.dtype))
@@ -188,6 +194,7 @@ class WavenetTrainer:
 
     def decay_lr(self):
         self.lr = self.lr * LR_DECAY
+        print ("DECAY LR")
 
         self.set_lr(self.classifier_optimizer)
         self.set_lr(self.model_optimizer)
