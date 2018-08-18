@@ -22,7 +22,8 @@ def print_last_validation_result(opt):
 
 
 NUM_GPU = 4
-CONFUSION_LOSS_WEIGHT = 10 ** -2
+CONFUSION_LOSS_WEIGHT = 0.1 # they did 0.01
+
 INIT_LR = 10 ** -3
 LR_DECAY = 0.98
 LR_DECAY_TIME = 5
@@ -152,7 +153,8 @@ class WavenetTrainer:
                 output = self.train_model(data).squeeze()
                 model_loss = F.cross_entropy(output, target)
 
-                loss = model_loss - CONFUSION_LOSS_WEIGHT * classifier_loss
+                # why did UMT subtract?
+                loss = model_loss + CONFUSION_LOSS_WEIGHT * classifier_loss
                 self.model_optimizer.zero_grad()
                 loss.backward()
                 loss = loss.item()
