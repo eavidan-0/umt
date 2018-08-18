@@ -267,9 +267,9 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
 
     def _get_item_index(self, domain_idx, idx):
         D = len(DOMAINS)
-        idx_in_batch = idx % self._batch_size
+        idx_in_batch = idx % self.batch_size
         batch_in_domain = int(idx / self.batch_size)
-        batch_start = (D * batch_in_domain + domain_index) * self.batch_size
+        batch_start = (D * batch_in_domain + domain_idx) * self.batch_size
 
         return batch_start + idx_in_batch
 
