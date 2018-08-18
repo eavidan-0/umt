@@ -7,7 +7,7 @@ import librosa as lr
 
 # Umt downsampled by x12.5, but need divisability
 # Nsynth used x32
-DOWNSAMPLE_FACTOR = 80
+DOWNSAMPLE_FACTOR = 160
 ENC_LEN = SR / DOWNSAMPLE_FACTOR
 if not ENC_LEN == int(ENC_LEN):
     raise ValueError("SR not divisable") 
