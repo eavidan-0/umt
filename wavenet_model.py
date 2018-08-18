@@ -32,7 +32,7 @@ class WaveNetModel(nn.Module):
                  blocks,
                  classes,
                  output_length,
-                 layers=6,
+                 layers=8,
                  channels=128,
                  kernel_size=2,
                  dtype=torch.FloatTensor,

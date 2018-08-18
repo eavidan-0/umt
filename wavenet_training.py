@@ -165,8 +165,8 @@ class WavenetTrainer:
                 output = self.train_model(data).squeeze()
                 model_loss = F.cross_entropy(output, target)
 
-                # why did UMT subtract?
-                loss = model_loss + CONFUSION_LOSS_WEIGHT * classifier_loss
+                # why did UMT subtract? adversarial?
+                loss = model_loss - CONFUSION_LOSS_WEIGHT * classifier_loss
                 self.model_optimizer.zero_grad()
                 loss.backward()
                 loss = loss.item()
