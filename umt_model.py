@@ -5,9 +5,9 @@ import torch
 import torch.nn.functional as F
 import librosa as lr
 
-# They downsampled by x12.5, but need divisability
+# Umt downsampled by x12.5, but need divisability
 # Nsynth used x32
-DOWNSAMPLE_FACTOR = 20
+DOWNSAMPLE_FACTOR = 80
 ENC_LEN = SR / DOWNSAMPLE_FACTOR
 if not ENC_LEN == int(ENC_LEN):
     raise ValueError("SR not divisable") 
