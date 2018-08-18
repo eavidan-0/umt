@@ -247,7 +247,7 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
         self.length = len(data_source)
         self.batch_size = batch_size
 
-        self.range_base = range(self.length / len(DOMAINS))
+        self.range_base = range(self.length // len(DOMAINS))
 
     def __iter__(self):
         D = len(DOMAINS)
