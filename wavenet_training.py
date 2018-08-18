@@ -23,7 +23,7 @@ def print_last_validation_result(opt):
 
 
 NUM_GPU = 4
-CONFUSION_LOSS_WEIGHT = 0.05  # they did 0.01
+CONFUSION_LOSS_WEIGHT = 0.1  # they did 0.01
 
 INIT_LR = 10 ** -3
 LR_DECAY = 0.98
@@ -122,7 +122,8 @@ class WavenetTrainer:
                                                       #   shuffle=True,
                                                       num_workers=2,  # num_workers=8,
                                                       pin_memory=False)
-        step = start_epoch * len(self.dataset) / batch_size
+        self.snapshot_interval = len(self.dataset) / batch_size
+        step = start_epoch * self.snapshot_interval
 
         # return to previous params
         for _ in range(start_epoch):
