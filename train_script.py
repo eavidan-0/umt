@@ -1,6 +1,6 @@
 from umt_model import *
 from UmtDataset import *
-from audio_data import WavenetDataset
+from audio_data import *
 from wavenet_training import *
 from model_logging import *
 from scipy.io import wavfile
