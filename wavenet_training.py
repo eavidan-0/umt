@@ -3,6 +3,7 @@ import torch.optim as optim
 import torch.utils.data
 import time
 import os
+from functools import reduce
 from datetime import datetime
 import torch.nn.functional as F
 from torch.autograd import Variable
