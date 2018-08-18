@@ -30,8 +30,8 @@ print ('item_length', model.item_length)
 print ('target_length', model.target_length)
 
 # reload snapshot
-start_epoch = 0
-# model = load_latest_model_from('snapshots', use_cuda=use_cuda)
+start_epoch = 13
+model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
 if use_cuda:
     print("move model to gpu")

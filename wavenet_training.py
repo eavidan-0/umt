@@ -10,6 +10,7 @@ from model_logging import Logger
 from wavenet_modules import *
 from umt_model import *
 from random import random
+import itertools
 
 use_cuda = torch.cuda.is_available()
 
@@ -119,7 +120,8 @@ class WavenetTrainer:
         print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_size=batch_size,
-                                                      #   shuffle=True,
+                                                      batch_sampler=MultiDomainRandomSampler(
+                                                          self.dataset, batch_size),
                                                       num_workers=2,  # num_workers=8,
                                                       pin_memory=False)
         self.snapshot_interval = len(self.dataset) / batch_size
@@ -135,8 +137,8 @@ class WavenetTrainer:
                 self.decay_lr()
 
             tic = time.time()
-            # Shuffle entire batches to ensure same domain index
-            for data in sorted(iter(self.dataloader), key=lambda k: random()):
+            # TODO: Shuffle entire batches to ensure same domain index
+            for data in iter(self.dataloader):
                 domain_index, x, target = data
 
                 x = Variable(x.type(self.dtype))
@@ -238,3 +240,50 @@ def generate_audio(model,
         samples.append(model.generate_fast(length, temperature=temp))
     samples = np.stack(samples, axis=0)
     return samples
+
+
+class MultiDomainRandomSampler(Sampler):
+    def __init__(self, data_source, batch_size):
+        self.length = len(data_source)
+        self.batch_size = batch_size
+
+        self.range_base = range(self.length / D)
+
+    def __iter__(self):
+        D = len(DOMAINS)
+        domain_batches = itertools.chain(map(lambda idx: self._get_domain_range(idx), range(D)))
+
+        # provides randomness between domains, in batches
+        return randomize(domain_ranges)
+
+    def _get_domain_range(self, domain_idx):
+        # provides randomness - inside the domain
+        d_range = map(lambda idx: self._get_item_index(
+            domain_idx, idx), range_base)
+
+        rand_range = randomize(d_range)
+        b_range = grouper(self.batch_size, rand_range))
+
+        return b_range
+
+    def _get_item_index(self, domain_idx, idx):
+        D = len(DOMAINS)
+        idx_in_batch = idx % self._batch_size
+        batch_in_domain = int(idx / self.batch_size)
+        batch_start = (D * batch_in_domain + domain_index) * self.batch_size
+
+        return batch_start + idx_in_batch
+
+    def __len__(self):
+        return self.length
+    
+def randomize(iterable):
+    return sorted(iterable, key=lambda k: random())
+
+def grouper(n, iterable):
+    it = iter(iterable)
+    while True:
+       chunk = tuple(itertools.islice(it, n))
+       if not chunk:
+           return
+       yield chunk
