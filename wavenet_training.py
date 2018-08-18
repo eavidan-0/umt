@@ -119,6 +119,7 @@ class WavenetTrainer:
         self.train_model.train()
         print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
+                                                      batch_size=batch_size,
                                                       sampler=MultiDomainRandomSampler(
                                                           self.dataset, batch_size),
                                                       num_workers=0,  # num_workers=8,
