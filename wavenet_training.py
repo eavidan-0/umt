@@ -22,7 +22,7 @@ def print_last_validation_result(opt):
 
 
 NUM_GPU = 4
-CONFUSION_LOSS_WEIGHT = 0.1 # they did 0.01
+CONFUSION_LOSS_WEIGHT = 0.05  # they did 0.01
 
 INIT_LR = 10 ** -3
 LR_DECAY = 0.98
@@ -62,7 +62,10 @@ class DomainClassifier(nn.Module):
         x = F.elu(x, alpha=1.0)
 
         x = F.avg_pool1d(x, kernel_size=x.size()[2])
-        return x.squeeze()
+        x = x.squeeze()  # [batch, D]
+        x = F.normalize(x, dim=1)
+
+        return x
 
 
 class WavenetTrainer:
@@ -185,7 +188,6 @@ class WavenetTrainer:
 
     def decay_lr(self):
         self.lr = self.lr * LR_DECAY
-        print ("DECAY LR", sample_ind)
 
         self.set_lr(self.classifier_optimizer)
         self.set_lr(self.model_optimizer)
