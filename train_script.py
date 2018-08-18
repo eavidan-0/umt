@@ -31,7 +31,7 @@ print ('target_length', model.target_length)
 
 # reload snapshot
 continue_training_at_step = 0
-model = load_latest_model_from('snapshots', use_cuda=use_cuda)
+# model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
 if use_cuda:
     print("move model to gpu")
@@ -44,21 +44,7 @@ data = UmtDataset(item_length=model.item_length,
 
 
 def generate_and_log_samples(step):
-    sample_length = 32000
-    gen_model = load_latest_model_from('snapshots', use_cuda=False)
-    print("start generating...")
-    samples = generate_audio(gen_model,
-                             length=sample_length,
-                             temperatures=[0.5])
-    tf_samples = tf.convert_to_tensor(samples, dtype=tf.float32)
-    logger.audio_summary('temperature_0.5', tf_samples, step, sr=16000)
-
-    samples = generate_audio(gen_model,
-                             length=sample_length,
-                             temperatures=[1.])
-    tf_samples = tf.convert_to_tensor(samples, dtype=tf.float32)
-    logger.audio_summary('temperature_1.0', tf_samples, step, sr=16000)
-    print("audio clips generated")
+    pass
 
 
 logger = TensorboardLogger(log_interval=200,

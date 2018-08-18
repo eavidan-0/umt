@@ -65,13 +65,6 @@ for in_file in input_files:
                                                  num_workers=2,  # num_workers=8,
                                                  pin_memory=False)
 
-        # generated = model.generate_fast(num_samples=16000,
-        #                                 first_samples=data,
-        #                                 progress_callback=prog_callback,
-        #                                 progress_interval=1000,
-        #                                 temperature=1.0,
-        #                                 regularize=0.)
-
         i = 0
         total = len(dataset)
         total = 30

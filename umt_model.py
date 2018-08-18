@@ -1,12 +1,13 @@
 from wavenet_model import *
+from audio_data import *
 import numpy as np
 import torch
 import torch.nn.functional as F
 import librosa as lr
 
-ENC_LEN = 64
-POOL_KERNEL = 50
-SR = 16000
+# 12.5 downsample
+ENC_LEN = SR / 12.5
+POOL_KERNEL = SR / ENC_LEN
 
 
 class UmtModel(nn.Module):
@@ -17,8 +18,6 @@ class UmtModel(nn.Module):
         self.classes = classes
         self.is_training = train
 
-        # TODO: is this really the correct output?
-        # Cause they said 12.5 downsample, not 250
         self.encoder = WaveNetModel(blocks=3,
                                     classes=self.classes,
                                     output_length=ENC_LEN * POOL_KERNEL,

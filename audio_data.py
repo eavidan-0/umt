@@ -13,15 +13,16 @@ from random import random, randint
 
 DOMAINS = ["Ed Sheeran", "Metallica"]
 DOMAIN_IDS = list(range(len(DOMAINS)))
+SR = 16000
 
 class WavenetDataset(torch.utils.data.Dataset):
     def __init__(self,
                  dataset_file,
                  item_length,
                  target_length,
+                 sampling_rate=SR,
                  file_location=None,
                  classes=256,
-                 sampling_rate=16000,
                  mono=True,
                  normalize=False,
                  domain_index=0,

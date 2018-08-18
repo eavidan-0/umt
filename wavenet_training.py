@@ -23,6 +23,9 @@ def print_last_validation_result(opt):
 
 NUM_GPU = 4
 CONFUSION_LOSS_WEIGHT = 10 ** -2
+INIT_LR = 10 ** -3
+LR_DECAY = 0.98
+LR_DECAY_TIME = 10000
 
 
 class DomainClassifier(nn.Module):
@@ -66,7 +69,7 @@ class WavenetTrainer:
                  model,
                  dataset,
                  optimizer=optim.Adam,
-                 lr=0.001,
+                 lr=INIT_LR,
                  weight_decay=0,
                  gradient_clipping=None,
                  logger=Logger(),
@@ -152,6 +155,7 @@ class WavenetTrainer:
                         self.train_model.parameters(), self.clip)
                 self.model_optimizer.step()
                 step += 1
+                self.decay_lr(step, batch_size)
 
                 # time step duration:
                 if step % 10 == 0:
@@ -170,6 +174,21 @@ class WavenetTrainer:
                                '/' + self.snapshot_name + '_' + time_string)
 
                 self.logger.log(step, loss)
+
+    def decay_lr(self, step, batch_size):
+        sample_ind = step * batch_size
+
+        if int(sample_ind / LR_DECAY_TIME) == int((sample_ind - batch_size) / LR_DECAY_TIME):
+            return
+
+        self.lr = self.lr * LR_DECAY
+
+        self.set_lr(self.classifier_optimizer)
+        self.set_lr(self.model_optimizer)
+
+    def set_lr(self, optimizer):
+        for param_group in optimizer.param_groups:
+            param_group['lr'] *= self.lr
 
     def validate(self):
         self.model.eval()

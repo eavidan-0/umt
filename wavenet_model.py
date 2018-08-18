@@ -29,9 +29,9 @@ class WaveNetModel(nn.Module):
     """
 
     def __init__(self,
-                 layers=10,
+                 layers=6,
                  blocks=4,
-                 channels=64,
+                 channels=128,
                  classes=256,
                  output_length=32,
                  kernel_size=2,
@@ -91,15 +91,10 @@ class WaveNetModel(nn.Module):
                 prev_dilation = dilation
                 dilation *= 2
 
-        self.end_conv_1 = nn.Conv1d(in_channels=channels,
-                                    out_channels=channels,
-                                    kernel_size=1,
-                                    bias=True)
-
-        self.end_conv_2 = nn.Conv1d(in_channels=channels,
-                                    out_channels=classes,
-                                    kernel_size=1,
-                                    bias=True)
+        self.end_conv = nn.Conv1d(in_channels=channels,
+                                  out_channels=classes,
+                                  kernel_size=1,
+                                  bias=True)
 
         # self.output_length = 2 ** (layers - 1)
         self.output_length = output_length
@@ -132,7 +127,7 @@ class WaveNetModel(nn.Module):
         # x = F.relu(x)
         # x = self.end_conv_1(x)
         # x = F.relu(x)
-        x = self.end_conv_2(x)
+        x = self.end_conv(x)
 
         return x
 

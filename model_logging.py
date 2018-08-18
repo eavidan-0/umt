@@ -90,7 +90,7 @@ class TensorboardLogger(Logger):
     def log_audio(self, step):
         samples = self.generate_function()
         tf_samples = tf.convert_to_tensor(samples)
-        self.audio_summary('audio sample', tf_samples, step, sr=16000)
+        self.audio_summary('audio sample', tf_samples, step, sr=SR)
 
     def scalar_summary(self, tag, value, step):
         """Log a scalar variable."""
@@ -120,7 +120,7 @@ class TensorboardLogger(Logger):
         summary = tf.Summary(value=img_summaries)
         self.writer.add_summary(summary, step)
 
-    def audio_summary(self, tag, sample, step, sr=16000):
+    def audio_summary(self, tag, sample, step, sr=SR):
         with tf.Session() as sess:
             audio_summary = tf.summary.audio(tag, sample, sample_rate=sr, max_outputs=4)
             summary = sess.run(audio_summary)
