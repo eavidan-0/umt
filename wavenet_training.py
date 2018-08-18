@@ -242,7 +242,7 @@ def generate_audio(model,
     return samples
 
 
-class MultiDomainRandomSampler(Sampler):
+class MultiDomainRandomSampler(torch.utils.data.Sampler):
     def __init__(self, data_source, batch_size):
         self.length = len(data_source)
         self.batch_size = batch_size
