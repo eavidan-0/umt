@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import scipy.misc
 import threading
+from audio_data import *
 
 try:
     from StringIO import StringIO  # Python 2.7
