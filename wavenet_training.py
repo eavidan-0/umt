@@ -25,7 +25,7 @@ NUM_GPU = 4
 CONFUSION_LOSS_WEIGHT = 10 ** -2
 INIT_LR = 10 ** -3
 LR_DECAY = 0.98
-LR_DECAY_TIME = 10000
+LR_DECAY_TIME = 5
 
 
 class DomainClassifier(nn.Module):
@@ -121,6 +121,9 @@ class WavenetTrainer:
         step = continue_training_at_step
         for current_epoch in range(epochs):
             print("epoch", current_epoch)
+            if epoch != 0 && epoch % LR_DECAY_TIME == 0:
+                self.decay_lr()
+
             tic = time.time()
             for data in iter(self.dataloader):
                 domain_index, x, target = data
@@ -159,7 +162,6 @@ class WavenetTrainer:
                         self.train_model.parameters(), self.clip)
                 self.model_optimizer.step()
                 step += 1
-                self.decay_lr(step, batch_size)
 
                 # time step duration:
                 if step % 10 == 0:
@@ -173,18 +175,13 @@ class WavenetTrainer:
                     if self.snapshot_path is None:
                         continue
                     time_string = time.strftime(
-                        "%Y-%m-%d_%H-%M-%S", time.gmtime())
+                        "%Y-%m-%d_%H-%M", time.gmtime())
                     torch.save(self.model, self.snapshot_path +
                                '/' + self.snapshot_name + '_' + time_string)
 
-                self.logger.log(step, loss)
+                self.logger.log(step, loss)            
 
-    def decay_lr(self, step, batch_size):
-        sample_ind = step * batch_size
-
-        if int(sample_ind / LR_DECAY_TIME) == int((sample_ind - batch_size) / LR_DECAY_TIME):
-            return
-
+    def decay_lr(self):
         self.lr = self.lr * LR_DECAY
         print ("DECAY LR", sample_ind)
 
