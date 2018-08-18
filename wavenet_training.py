@@ -121,7 +121,7 @@ class WavenetTrainer:
         step = continue_training_at_step
         for current_epoch in range(epochs):
             print("epoch", current_epoch)
-            if epoch != 0 and epoch % LR_DECAY_TIME == 0:
+            if current_epoch != 0 and current_epoch % LR_DECAY_TIME == 0:
                 self.decay_lr()
 
             tic = time.time()
@@ -179,7 +179,7 @@ class WavenetTrainer:
                     torch.save(self.model, self.snapshot_path +
                                '/' + self.snapshot_name + '_' + time_string)
 
-                self.logger.log(step, loss)            
+                self.logger.log(step, loss)
 
     def decay_lr(self):
         self.lr = self.lr * LR_DECAY
