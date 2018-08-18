@@ -277,7 +277,7 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
         return self.length
     
 def randomize(iterable):
-    return sorted(iterable, key=lambda k: random())
+    return iter(sorted(iterable, key=lambda k: random()))
 
 def grouper(n, iterable):
     it = iter(iterable)
