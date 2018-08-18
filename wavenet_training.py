@@ -121,7 +121,7 @@ class WavenetTrainer:
         step = continue_training_at_step
         for current_epoch in range(epochs):
             print("epoch", current_epoch)
-            if epoch != 0 && epoch % LR_DECAY_TIME == 0:
+            if epoch != 0 and epoch % LR_DECAY_TIME == 0:
                 self.decay_lr()
 
             tic = time.time()
