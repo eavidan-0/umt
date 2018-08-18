@@ -119,7 +119,7 @@ class WavenetTrainer:
         self.train_model.train()
         print("dataset length is", len(self.dataset))
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
-                                                      batch_sampler=MultiDomainRandomSampler(
+                                                      sampler=MultiDomainRandomSampler(
                                                           self.dataset, batch_size),
                                                       num_workers=0,  # num_workers=8,
                                                       pin_memory=False)
@@ -250,10 +250,12 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
 
     def __iter__(self):
         D = len(DOMAINS)
-        domain_batches = itertools.chain(map(lambda idx: self._get_domain_range(idx), range(D)))
+        domain_batches = itertools.chain(
+            map(lambda idx: self._get_domain_range(idx), range(D)))
 
         # provides randomness between domains, in batches
-        return iter(randomize(domain_batches))
+        batches = randomize(domain_batches)
+        return iter(itertools.chain(batches))
 
     def _get_domain_range(self, domain_idx):
         # provides randomness - inside the domain
@@ -275,14 +277,16 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
 
     def __len__(self):
         return self.length
-    
+
+
 def randomize(iterable):
     return sorted(iterable, key=lambda k: random())
+
 
 def grouper(n, iterable):
     it = iter(iterable)
     while True:
-       chunk = tuple(itertools.islice(it, n))
-       if not chunk:
-           return
-       yield chunk
+        chunk = tuple(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
