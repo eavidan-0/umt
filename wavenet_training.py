@@ -294,9 +294,9 @@ def grouper(n, iterable):
 def merge_iters(iters):
     iters = list(iters)
     for i in iters:
-        next = next(i)
-        if not next:
+        out = next(i)
+        if not out:
             return
         
-        yield next
+        yield out
         
