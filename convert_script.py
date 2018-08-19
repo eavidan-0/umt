@@ -100,13 +100,11 @@ for in_file in input_files:
         generated = map(lambda x: convert_output_to_signal(
             x, classes), generated)
         generated = list(itertools.islice(generated, total))
-        generated = np.concatenate(generated[:])
+        generated = np.concatenate(generated.flatten())
 
         # convert data to signal...
         generated = (generated / classes) * 2. - 1
         generated = mu_law_expansion(generated, classes)
-
-        print (generated.shape)
 
         out_path = GENERATION_OUTPUTS + "/" + filename + \
             '.' + DOMAINS[domain_index].replace(" ", "") + '.wav'
