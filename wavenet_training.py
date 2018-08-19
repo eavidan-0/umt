@@ -289,12 +289,12 @@ def grouper(n, iterable):
         chunk = tuple(itertools.islice(it, n))
         if not chunk:
             return
-        yield chunk
+        yield chunk 
 
-def merge_iters(generators):
-    iters = list(map(iter, generators))
+def merge_iters(iters):
+    iters = list(iters)
     for i in iters:
-        next = i.next()
+        next = next(i)
         if not next:
             return
         
