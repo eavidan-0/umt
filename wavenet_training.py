@@ -253,7 +253,7 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
         domain_batches = map(lambda idx: self._get_domain_range(idx), range(D))
 
         # provides round-robin between domains
-        batches = merge_iters(domain_batches)
+        batches = roundrobin(domain_batches)
         return iter(batches)
 
     def _get_domain_range(self, domain_idx):
@@ -289,14 +289,17 @@ def grouper(n, iterable):
         chunk = tuple(itertools.islice(it, n))
         if not chunk:
             return
-        yield chunk 
+        yield chunk
 
-def merge_iters(iters):
-    iters = list(iters)
-    for i in iters:
-        out = next(i)
-        if not out:
-            return
-        
-        yield out
-        
+ def roundrobin(*iterables):
+    "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
+    # Recipe credited to George Sakkis
+    num_active = len(iterables)
+    nexts = itertools.cycle(iter(it).__next__ for it in iterables)
+    while num_active:
+        try:
+            for n in nexts:
+                yield n()
+        except StopIteration:
+            num_active -= 1
+            nexts = itertools.cycle(itertools.islice(nexts, num_active))
