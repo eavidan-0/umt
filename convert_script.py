@@ -98,9 +98,9 @@ for in_file in input_files:
         generated = map(model.forward, iter(data))
         # generated = map(prog_callback, generated)
         generated = map(lambda x: convert_output_to_signal(
-            x, classes), generated)
+            x, classes).flatten(), generated)
         generated = list(itertools.islice(generated, total))
-        generated = np.concatenate(generated.flatten())
+        generated = np.concatenate(generated)
 
         # convert data to signal...
         generated = (generated / classes) * 2. - 1
