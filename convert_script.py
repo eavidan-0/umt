@@ -67,7 +67,7 @@ for in_file in input_files:
 
         i = 0
         total = len(dataset)
-        total = 30
+        total = 15
         print (total, "samples")
 
         def prog_callback(x):

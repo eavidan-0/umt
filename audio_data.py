@@ -11,7 +11,7 @@ import torch.nn.functional as F
 
 from random import random, randint
 
-DOMAINS = ["Ed Sheeran", "Metallica"]
+DOMAINS = ["Ed Sheeran", "Metallica", "Bon Jovi", "Coldplay"]
 DOMAIN_IDS = list(range(len(DOMAINS)))
 SR = 16000
 
@@ -20,12 +20,12 @@ class WavenetDataset(torch.utils.data.Dataset):
                  dataset_file,
                  item_length,
                  target_length,
+                 domain_index,
                  sampling_rate=SR,
                  file_location=None,
                  classes=256,
                  mono=True,
                  normalize=False,
-                 domain_index=0,
                  dtype=np.uint8,
                  train=True,
                  test_stride=100):
