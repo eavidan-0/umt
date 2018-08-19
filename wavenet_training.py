@@ -251,10 +251,9 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
     def __iter__(self):
         D = len(DOMAINS)
         domain_batches = map(lambda idx: self._get_domain_range(idx), range(D))
-        all_batches = reduce(itertools.chain, domain_batches)
 
         # provides round-robin between domains
-        batches = merge_iters(all_batches)
+        batches = merge_iters(domain_batches)
         return iter(batches)
 
     def _get_domain_range(self, domain_idx):
