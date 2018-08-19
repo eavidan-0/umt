@@ -291,8 +291,8 @@ def grouper(n, iterable):
             return
         yield chunk
 
-def merge_iters(iters):
-    iters = list(iters)
+def merge_iters(generators):
+    iters = list(map(iter, generators))
     for i in iters:
         next = i.next()
         if not next:
