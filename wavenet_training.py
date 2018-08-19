@@ -122,7 +122,7 @@ class WavenetTrainer:
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_sampler=MultiDomainRandomSampler(
                                                           self.dataset, batch_size),
-                                                      num_workers=0,
+                                                      num_workers=8,
                                                       pin_memory=False)
         self.snapshot_interval = len(self.dataset) / batch_size
         step = int(start_epoch * self.snapshot_interval)
@@ -296,14 +296,11 @@ def roundrobin(iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
     num_active = len(iterables)
-    print(num_active, iterables)
-    nexts = itertools.cycle(iter(it).__next__ for it in iterables)
+    nexts = itertools.cycle([iter(it).__next__ for it in iterables])
     while num_active:
         try:
             for n in nexts:
-                x = n()
-                print (x)
-                yield x
+                yield n()
         except StopIteration:
             num_active -= 1
             nexts = itertools.cycle(itertools.islice(nexts, num_active))
