@@ -60,14 +60,14 @@ for in_file in input_files:
                                  test_stride=1)
 
         dataloader = torch.utils.data.DataLoader(dataset,
-                                                 batch_size=16,
+                                                 batch_size=BATCH_SIZE,
                                                  shuffle=False,
                                                  num_workers=4,  # num_workers=8,
                                                  pin_memory=False)
 
         i = 0
-        total = len(dataset)
-        total = 16
+        total = len(dataset) // BATCH_SIZE
+        total = 16 // BATCH_SIZE
         print (total, "samples")
 
         def prog_callback(x):
