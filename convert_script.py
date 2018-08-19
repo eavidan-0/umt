@@ -60,14 +60,14 @@ for in_file in input_files:
                                  test_stride=1)
 
         dataloader = torch.utils.data.DataLoader(dataset,
-                                                 batch_size=1,
+                                                 batch_size=16,
                                                  shuffle=False,
-                                                 num_workers=2,  # num_workers=8,
+                                                 num_workers=4,  # num_workers=8,
                                                  pin_memory=False)
 
         i = 0
         total = len(dataset)
-        total = 15
+        total = 16
         print (total, "samples")
 
         def prog_callback(x):
@@ -80,7 +80,7 @@ for in_file in input_files:
         generated = map(lambda x: convert_output_to_signal(
             x, model.classes), generated)
         generated = list(itertools.islice(generated, total))
-        generated = np.concatenate(generated)
+        generated = np.concatenate(generated[:])
 
         # convert data to signal...
         generated = (generated / model.classes) * 2. - 1
