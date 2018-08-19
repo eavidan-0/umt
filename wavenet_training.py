@@ -122,7 +122,7 @@ class WavenetTrainer:
         self.dataloader = torch.utils.data.DataLoader(self.dataset,
                                                       batch_sampler=MultiDomainRandomSampler(
                                                           self.dataset, batch_size),
-                                                      num_workers=8,
+                                                      num_workers=0,
                                                       pin_memory=False)
         self.snapshot_interval = len(self.dataset) / batch_size
         step = int(start_epoch * self.snapshot_interval)
