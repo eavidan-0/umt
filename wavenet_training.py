@@ -262,10 +262,10 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
             domain_idx, idx), self.range_base)
 
         # maybe switch these?
-        rand_range = randomize(d_range)
-        b_range = grouper(self.batch_size, rand_range)
+        b_range = grouper(self.batch_size, d_range)
+        rand_range = randomize(b_range)
 
-        return b_range
+        return rand_range
 
     def _get_item_index(self, domain_idx, idx):
         D = len(DOMAINS)
