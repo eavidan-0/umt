@@ -33,7 +33,7 @@ if use_cuda:
     print("move model to gpu")
     model.cuda()
     model = torch.nn.parallel.DataParallel(
-        modelI, device_ids=list(range(NUM_GPU)))
+        model, device_ids=list(range(NUM_GPU)))
 
 print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
