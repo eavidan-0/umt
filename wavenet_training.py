@@ -296,7 +296,7 @@ def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
     num_active = len(iterables)
-    nexts = itertools.cycle(iter(it).__next__ for it in iterables)
+    nexts = itertools.cycle([iter(it).__next__ for it in iterables])
     while num_active:
         try:
             for n in nexts:
