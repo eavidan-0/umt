@@ -292,7 +292,7 @@ def grouper(n, iterable):
         yield chunk
 
 
-def roundrobin(*iterables):
+def roundrobin(iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
     num_active = len(iterables)
