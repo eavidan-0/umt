@@ -253,7 +253,7 @@ class MultiDomainRandomSampler(torch.utils.data.Sampler):
         domain_batches = map(lambda idx: self._get_domain_range(idx), range(D))
 
         # provides round-robin between domains
-        batches = roundrobin(...domain_batches)
+        batches = roundrobin(list(domain_batches))
         return iter(batches)
 
     def _get_domain_range(self, domain_idx):
@@ -296,11 +296,14 @@ def roundrobin(*iterables):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
     num_active = len(iterables)
-    nexts = itertools.cycle([iter(it).__next__ for it in iterables])
+    print(num_active, iterables)
+    nexts = itertools.cycle(iter(it).__next__ for it in iterables)
     while num_active:
         try:
             for n in nexts:
-                yield n()
+                x = n()
+                print (x)
+                yield x
         except StopIteration:
             num_active -= 1
             nexts = itertools.cycle(itertools.islice(nexts, num_active))
