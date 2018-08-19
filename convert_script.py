@@ -7,6 +7,8 @@ import itertools
 from audio_data import WavenetDataset
 from wavenet_training import *
 
+import torch
+
 from time import sleep
 sleep(2)
 
@@ -30,6 +32,8 @@ model.train = False
 if use_cuda:
     print("move model to gpu")
     model.cuda()
+    model = torch.nn.parallel.DataParallel(
+        modelI, device_ids=list(range(NUM_GPU)))
 
 print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
@@ -44,6 +48,17 @@ except OSError:
     pass
 
 input_files = list_all_audio_files(GENERATION_INPUTS)
+
+
+def data_to_type(data):
+    domain_index, x, target = data
+
+    x = Variable(x.type(dtype))
+    target = Variable(target.type(ltype)).squeeze()
+    domain_index = Variable(domain_index.type(ltype))
+
+    return (domain_index, x, target)
+
 
 for in_file in input_files:
     filename = os.path.splitext(os.path.basename(in_file))[0]
@@ -75,7 +90,8 @@ for in_file in input_files:
             print(str(100.0 * i / total) + "% generated")
             return x
 
-        generated = map(model.forward, iter(dataloader))
+        data = map(data_to_type, iter(dataloader))
+        generated = map(model.forward, iter(data))
         # generated = map(prog_callback, generated)
         generated = map(lambda x: convert_output_to_signal(
             x, model.classes), generated)
