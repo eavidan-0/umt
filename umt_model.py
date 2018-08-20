@@ -24,7 +24,7 @@ class UmtModel(nn.Module):
 
         self.encoder = WaveNetModel(blocks=3,
                                     classes=self.classes,
-                                    output_length=SR,
+                                    output_length=2 ** (7 - 1),
                                     dtype=dtype)
 
         decoders = [WaveNetModel(blocks=4,
@@ -62,7 +62,7 @@ class UmtModel(nn.Module):
         return self.encoder, lambda enc: self.post_encode(enc)
 
     def post_encode(self, enc):
-        latent = F.avg_pool1d(enc, kernel_size=DOWNSAMPLE_FACTOR)
+        # latent = F.avg_pool1d(enc, kernel_size=DOWNSAMPLE_FACTOR)
         return latent
 
     def forward(self, input_tuple):
