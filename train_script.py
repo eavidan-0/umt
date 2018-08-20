@@ -20,10 +20,6 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
-    NUM_GPU = 4
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
-        1:-1].replace(" ", "")
-
 model = UmtModel(dtype)
 print('parameter count: ', model.parameter_count())
 
