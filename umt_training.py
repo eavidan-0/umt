@@ -84,9 +84,10 @@ class UmtTrainer:
                 self.decay_lr()
 
                 if self.snapshot_path is None:
-                        continue
+                    continue
 
-                    time_string = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
+                    time_string = time.strftime(
+                        "%Y-%m-%d_%H-%M", time.gmtime())
                     torch.save(self.model, snapshot_prefix + time_string)
 
             # TODO: Shuffle entire batches to ensure same domain index
@@ -143,12 +144,14 @@ class UmtTrainer:
         for param_group in optimizer.param_groups:
             param_group['lr'] *= self.lr
 
+
 def create_dataloader(dataset, batch_size):
     return torch.utils.data.DataLoader(dataset,
                                        batch_size=batch_size,
                                        shuffle=False,
                                        num_workers=4,
                                        pin_memory=False)
+
 
 def randomize(iterable):
     return sorted(iterable, key=lambda k: random())
