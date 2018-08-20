@@ -97,7 +97,7 @@ class UmtTrainer:
                         "%Y-%m-%d_%H-%M", time.gmtime())
                     torch.save(self.model, snapshot_prefix + time_string)
 
-            # TODO: Shuffle entire batches to ensure same domain index
+            # Shuffle entire batches to ensure same domain index
             for data in roundrobin(dataloaders):
                 domain_index, x, target = data
 

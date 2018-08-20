@@ -68,7 +68,7 @@ class UmtModel(nn.Module):
         # TODO: Mu input and output
         # upsampled_latent = quantize_data(upsampled_latent, self.classes)
         out = self.decoders[domain_index].forward(upsampled_latent)
-        # out = decode_mu(out, self.classes)  # TODO: or just expansion?
+        # out = decode_mu(out, self.classes)  # or just expansion?
 
         # TODO: ahemm....
         out = F.interpolate(out, size=SR, mode='nearest')

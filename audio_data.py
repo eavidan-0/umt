@@ -133,8 +133,6 @@ class WavenetDataset(torch.utils.data.Dataset):
             sample = np.concatenate((sample1, sample2))
 
         # Only if training: Pitch modulation
-        # TODO: is this different every time?
-        # TODO: this should have been before mu-law...
         if self.train:
             # Reverse quantization and encoding
             y = decode_mu(sample, self.classes)

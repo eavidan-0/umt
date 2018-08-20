@@ -14,7 +14,7 @@ def make_dot(var, params):
     Args:
         var: output Variable
         params: dict of (name, Variable) to add names to node that
-            require grad (TODO: make optional)
+            require grad
     """
     param_map = {id(v): k for k, v in params.items()}
 
@@ -32,14 +32,16 @@ def make_dot(var, params):
 
     def add_nodes(var):
         if var not in seen:
-            #if torch.is_tensor(var):
+            # if torch.is_tensor(var):
             #    dot.node(str(id(var)), size_to_str(var.size()), fillcolor='orange')
             if hasattr(var, 'variable'):
                 u = var.variable
-                node_name = '%s\n %s' % (param_map[id(u)], size_to_str(u.size()))
+                node_name = '%s\n %s' % (
+                    param_map[id(u)], size_to_str(u.size()))
                 dot.node(str(id(var)), node_name, fillcolor='lightblue')
             else:
-                dot.node(str(id(var)), str(type(var).__name__).replace('Backward', ''))
+                dot.node(str(id(var)), str(
+                    type(var).__name__).replace('Backward', ''))
             seen.add(var)
             if hasattr(var, 'next_functions'):
                 for u in var.next_functions:
