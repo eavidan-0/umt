@@ -15,12 +15,12 @@ class EncoderModel(nn.Module):
     def __init__(self,
                  classes,
                  dilation,
-                 blocks=3,
-                 layers=10,
+                 bias,
+                 blocks,
+                 layers,
                  channels=128,
                  initial_kernel_size=2,
-                 dtype=torch.FloatTensor,
-                 bias=True):
+                 dtype=torch.FloatTensor):
 
         super(EncoderModel, self).__init__()
 
@@ -44,6 +44,7 @@ class EncoderModel(nn.Module):
 
         for b in range(blocks):
             kernel_size = initial_kernel_size
+            dilation = 1
             for i in range(layers):
                 # dilations of this layer - padding in order to keep constant channel width
                 padding = math.ceil(dilation * (kernel_size - 1) / 2)
@@ -92,8 +93,8 @@ class EncoderModel(nn.Module):
 
             # Step 5: Skip and Residual summation
             # start_idx overcomes dilated_conv with non-integer padding being rounded
-            start_idx = 0 if x.size() == residual.size() else (
-                self.kernels[i] - - 1)
+            same_size = x.size() == residual.size()
+            start_idx = 0 if same_size else self.kernels[i] - 1
             x = x + residual[:, :, start_idx:]
 
         output_length = input.size()[2] - self.input_trim
@@ -114,36 +115,8 @@ class EncoderModel(nn.Module):
 
     def cpu(self, type):
         self.dtype = type
-        # for q in self.dilated_queues:
-        #     q.dtype = type
-
-        for c in self.dilated_convs:
-            c.cpu()
-
-        for c in self.residual_convs:
-            c.cpu()
-
         super().cpu()
 
     def cuda(self, device, type):
         self.dtype = type
         super().cuda(device)
-
-
-def load_latest_model_from(location, use_cuda=True):
-    files = [location + "/" + f for f in os.listdir(location)]
-    newest_file = max(files, key=os.path.getctime)
-    print("load model " + newest_file)
-
-    if use_cuda:
-        model = torch.load(newest_file)
-    else:
-        model = load_to_cpu(newest_file)
-
-    return model
-
-
-def load_to_cpu(path):
-    model = torch.load(path, map_location=lambda storage, loc: storage)
-    model.cpu()
-    return model
