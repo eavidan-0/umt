@@ -63,8 +63,8 @@ class EncoderModel(nn.Module):
 
                 # increase kernel size
                 input_trim += dilation * (kernel_size - 1) - 2 * padding
-                # dilation *= 2
-                kernel_size *= 2
+                dilation *= 2
+                # kernel_size *= 2
 
         self.end_conv = nn.Conv1d(in_channels=channels,
                                   out_channels=classes,

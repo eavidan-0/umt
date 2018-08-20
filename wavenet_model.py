@@ -27,11 +27,11 @@ class WaveNetModel(nn.Module):
     """
 
     def __init__(self,
-                 layers=10,
-                 blocks=4,
-                 dilation_channels=32,
-                 residual_channels=16,
-                 skip_channels=16,
+                 layers,
+                 blocks,
+                 dilation_channels,
+                 residual_channels,
+                 skip_channels,
                  end_channels=256,
                  classes=256,
                  output_length=32,
