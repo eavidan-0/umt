@@ -14,12 +14,11 @@ PRE_POOL_LENGTH = ENC_LEN * POOL_KERNEL
 class EncoderModel(nn.Module):
     def __init__(self,
                  classes,
-                 dilation,
                  bias,
                  blocks,
                  layers,
                  channels=128,
-                 initial_kernel_size=2,
+                 kernel_size=2,
                  dtype=torch.FloatTensor):
 
         super(EncoderModel, self).__init__()
@@ -34,7 +33,6 @@ class EncoderModel(nn.Module):
 
         self.dilated_convs = nn.ModuleList()
         self.residual_convs = nn.ModuleList()
-        self.kernels = []
 
         # 1x1 convolution to create channels
         self.start_conv = nn.Conv1d(in_channels=self.classes,
@@ -43,17 +41,13 @@ class EncoderModel(nn.Module):
                                     bias=bias)
 
         for b in range(blocks):
-            kernel_size = initial_kernel_size
             dilation = 1
             for i in range(layers):
-                # dilations of this layer - padding in order to keep constant channel width
-                padding = math.ceil(dilation * (kernel_size - 1) / 2)
-                self.kernels.append(kernel_size)
+                # dilations of this layer
                 self.dilated_convs.append(nn.Conv1d(in_channels=channels,
                                                     out_channels=channels,
                                                     kernel_size=kernel_size,
                                                     dilation=dilation,
-                                                    padding=padding,
                                                     bias=bias))
 
                 # 1x1 convolution for residual connection
@@ -63,9 +57,8 @@ class EncoderModel(nn.Module):
                                                      bias=bias))
 
                 # increase kernel size
-                input_trim += dilation * (kernel_size - 1) - 2 * padding
+                input_trim += dilation * (kernel_size - 1)
                 dilation *= 2
-                # kernel_size *= 2
 
         self.end_conv = nn.Conv1d(in_channels=channels,
                                   out_channels=classes,
@@ -92,10 +85,8 @@ class EncoderModel(nn.Module):
             residual = self.residual_convs[i](residual)
 
             # Step 5: Skip and Residual summation
-            # start_idx overcomes dilated_conv with non-integer padding being rounded
-            same_size = x.size() == residual.size()
-            start_idx = 0 if same_size else self.kernels[i] - 1
-            x = x + residual[:, :, start_idx:]
+            layer_output_length = residual.size(2)
+            x = x[:, :, -layer_output_length:] + residual
 
         output_length = input.size()[2] - self.input_trim
         assert x.size()[2] == output_length, "expected encoder output %d, got %r" % (

@@ -23,7 +23,6 @@ class UmtModel(nn.Module):
 
         self.encoder = EncoderModel(blocks=2,
                                     layers=10,
-                                    dilation=4,
                                     classes=self.classes,
                                     dtype=dtype,
                                     bias=False)
