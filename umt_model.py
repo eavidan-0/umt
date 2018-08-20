@@ -16,17 +16,16 @@ class UmtModel(nn.Module):
         self.is_training = train
 
         self.encoder = EncoderModel(classes=self.classes,
-                                    dtype=dtype)
+                                    dtype=dtype,
+                                    bias=True)
 
-        decoders = [WaveNetModel(blocks=2,
-                                 layers=5,
+        decoders = [WaveNetModel(layers=10,
+                                 blocks=4,
                                  classes=self.classes,
                                  output_length=SR,
-                                 dtype=dtype) for _ in DOMAINS]
+                                 dtype=dtype,
+                                 bias=False) for _ in DOMAINS]
         self.decoders = nn.ModuleList(modules=decoders)
-
-        d = self.decoders[0]
-        e = self.encoder
 
     def encode(self, input_tuple):
         torch.set_grad_enabled(self.is_training)
@@ -40,8 +39,8 @@ class UmtModel(nn.Module):
                    ), "Mixed domain batch encountered"
 
         # Run through encoder
-        enc = self.encoder.forward(input)
-        return self.post_encode(enc)
+        enc = self.encoder(input)
+        return enc
 
     def forward(self, input_tuple):
         domain_index_tensor, input, _ = input_tuple
@@ -50,15 +49,14 @@ class UmtModel(nn.Module):
         latent = self.encode(input_tuple)
 
         # Upsample back to original sampling rate
-        # TODO: maybe everything SR? input_size[2]
         upsampled_latent = F.interpolate(latent, size=SR, mode='nearest')
 
         # Run through domain decoder
+        # Mu input and output
         upsampled_latent = quantize_data(upsampled_latent, self.classes)
         out = self.decoders[domain_index].forward(upsampled_latent)
-        out = decode_mu(out, self.classes)  # or just expansion
+        out = decode_mu(out, self.classes)  # TODO: or just expansion?
 
-        # TODO: mu-law again?
         return out
 
     def parameter_count(self):
@@ -79,3 +77,16 @@ class UmtModel(nn.Module):
             d.cuda(device, type)
 
         super().cuda(device)
+
+
+def load_latest_model_from(location, use_cuda=True):
+    files = [location + "/" + f for f in os.listdir(location)]
+    newest_file = max(files, key=os.path.getctime)
+    print("load model " + newest_file)
+
+    if use_cuda:
+        model = torch.load(newest_file)
+    else:
+        model = load_to_cpu(newest_file)
+
+    return model

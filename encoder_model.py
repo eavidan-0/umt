@@ -6,14 +6,10 @@ from audio_data import *
 import math
 import numpy as np
 
-# Umt downsampled by x12.5, but need divisability
-# Nsynth used x32
-DOWNSAMPLE_FACTOR = 40
-ENC_LEN = SR / DOWNSAMPLE_FACTOR
-if not ENC_LEN == int(ENC_LEN):
-    raise ValueError("SR not divisable") 
+ENC_LEN = 64
+POOL_KERNEL = 800
+PRE_POOL_LENGTH = ENC_LEN * POOL_KERNEL
 
-ENC_LEN = int(ENC_LEN)
 
 class EncoderModel(nn.Module):
     def __init__(self,
@@ -21,7 +17,7 @@ class EncoderModel(nn.Module):
                  blocks=3,
                  layers=10,
                  channels=128,
-                 kernel_size=2,
+                 initial_kernel_size=2,
                  dtype=torch.FloatTensor,
                  bias=True):
 
@@ -30,15 +26,14 @@ class EncoderModel(nn.Module):
         self.layers = layers
         self.blocks = blocks
         self.classes = classes
-        self.kernel_size = kernel_size
         self.dtype = dtype
 
         # build model
-        receptive_field = 1
-        prev_dilation = 1
+        input_trim = 0
 
         self.dilated_convs = nn.ModuleList()
         self.residual_convs = nn.ModuleList()
+        self.kernels = []
 
         # 1x1 convolution to create channels
         self.start_conv = nn.Conv1d(in_channels=self.classes,
@@ -47,14 +42,15 @@ class EncoderModel(nn.Module):
                                     bias=bias)
 
         for b in range(blocks):
-            additional_scope = kernel_size - 1
-            dilation = 1
+            dilation = 4
+            kernel_size = initial_kernel_size
             for i in range(layers):
                 # dilations of this layer - padding in order to keep constant channel width
-                padding = math.ceil(dilation * (self.kernel_size - 1) / 2)
+                padding = math.ceil(dilation * (kernel_size - 1) / 2)
+                kernels.append(kernel_size)
                 self.dilated_convs.append(nn.Conv1d(in_channels=channels,
                                                     out_channels=channels,
-                                                    kernel_size=self.kernel_size,
+                                                    kernel_size=kernel_size,
                                                     dilation=dilation,
                                                     padding=padding,
                                                     bias=bias))
@@ -65,15 +61,17 @@ class EncoderModel(nn.Module):
                                                      kernel_size=1,
                                                      bias=bias))
 
-                receptive_field += additional_scope
-                additional_scope *= 2
-                prev_dilation = dilation
-                dilation *= 2
+                # increase kernel size
+                input_trim += dilation * (kernel_size - 1) - 2 * padding
+                # dilation *= 2
+                kernel_size *= 2
 
         self.end_conv = nn.Conv1d(in_channels=channels,
                                   out_channels=classes,
                                   kernel_size=1,
                                   bias=True)
+
+        self.input_trim = input_trim
 
     def forward(self, input):
         x = self.start_conv(input)
@@ -94,12 +92,18 @@ class EncoderModel(nn.Module):
 
             # Step 5: Skip and Residual summation
             # start_idx overcomes dilated_conv with non-integer padding being rounded
-            start_idx = 0 if x.size() == residual.size() else (self.kernel_size - 1)
+            start_idx = 0 if x.size() == residual.size() else (self.kernels[i]- - 1)
+            print("conditioning", x.size(), residual.size(), start_idx)
             x = x + residual[:, :, start_idx:]
 
-        x = self.end_conv(x)
-        latent = F.avg_pool1d(x, kernel_size=DOWNSAMPLE_FACTOR)
+        output_length = input.size()[2] - self.input_trim
+        print("sizes", x.size(), input.size(), self.input_trim)
+        assert x.size()[2] == output_length
 
+        x = self.end_conv(x)
+        latent = F.avg_pool1d(x, kernel_size=output_length//ENC_LEN)
+
+        print("post pool", slatent.size())
         return latent
 
     def parameter_count(self):
