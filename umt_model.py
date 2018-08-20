@@ -88,7 +88,9 @@ class UmtModel(nn.Module):
         upsampled_latent = F.interpolate(latent, size=SR, mode='nearest')
 
         # Run through domain decoder
+        upsampled_latent = mu_law_encoding(upsampled_latent)
         out = self.decoders[domain_index].forward(upsampled_latent)
+        out = mu_law_expansion(out)
 
         # TODO: mu-law again?
         return out
