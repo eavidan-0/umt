@@ -76,6 +76,8 @@ class UmtTrainer:
         for _ in range(start_epoch):
             self.decay_lr()
 
+        snapshot_prefix = self.snapshot_path + '/' + self.snapshot_name + '_'
+
         for current_epoch in range(start_epoch, epochs):
             print("epoch", current_epoch)
             if current_epoch > start_epoch:
@@ -83,10 +85,9 @@ class UmtTrainer:
 
                 if self.snapshot_path is None:
                         continue
-                    time_string = time.strftime(
-                        "%Y-%m-%d_%H-%M", time.gmtime())
-                    torch.save(self.model, self.snapshot_path +
-                               '/' + self.snapshot_name + '_' + time_string)
+
+                    time_string = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
+                    torch.save(self.model, snapshot_prefix + time_string)
 
             # TODO: Shuffle entire batches to ensure same domain index
             for data in roundrobin(dataloaders):
