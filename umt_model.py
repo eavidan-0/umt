@@ -57,6 +57,8 @@ class UmtModel(nn.Module):
         out = self.decoders[domain_index].forward(upsampled_latent)
         # out = decode_mu(out, self.classes)  # TODO: or just expansion?
 
+        # TODO: ahemm....
+        out = F.interpolate(out, size=SR, mode='nearest')
         return out
 
     def parameter_count(self):
