@@ -36,5 +36,6 @@ class DomainClassifier(nn.Module):
 
         x = F.avg_pool1d(x, kernel_size=x.size()[2])
         x = x.squeeze()  # [batch, D]
+        x = F.normalize(x)
 
         return x
