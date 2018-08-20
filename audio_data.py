@@ -14,7 +14,7 @@ from random import random, randint
 DOMAINS = ["Ed Sheeran", "Coldplay"] # "Metallica", "Bon Jovi"
 DOMAIN_IDS = list(range(len(DOMAINS)))
 SR = 16000
-BATCH_SIZE = 8
+BATCH_SIZE = 16
 
 class WavenetDataset(torch.utils.data.Dataset):
     def __init__(self,

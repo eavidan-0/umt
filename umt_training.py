@@ -15,7 +15,7 @@ import itertools
 from domain_classifier import DomainClassifier
 
 use_cuda = torch.cuda.is_available()
-NUM_GPU = 2
+NUM_GPU = 4
 
 if use_cuda:
     os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
