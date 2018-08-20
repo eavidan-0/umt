@@ -14,6 +14,16 @@ if not ENC_LEN == int(ENC_LEN):
 
 ENC_LEN = int(ENC_LEN)
 
+ENCODER_LAYERS = 10
+ENCODER_OUTPUT_LENGTH = 2 ** (ENCODER_LAYERS - 1)
+ENC_LEN = 64
+
+DOWNSAMPLE_FACTOR = ENCODER_OUTPUT_LENGTH // ENC_LEN
+if not DOWNSAMPLE_FACTOR == int(DOWNSAMPLE_FACTOR):
+    raise ValueError("ENC_LEN not divisable") 
+
+DOWNSAMPLE_FACTOR = int(DOWNSAMPLE_FACTOR)
+
 class UmtModel(nn.Module):
     def __init__(self, dtype, classes=256, train=True):
         super(UmtModel, self).__init__()
@@ -24,7 +34,8 @@ class UmtModel(nn.Module):
 
         self.encoder = WaveNetModel(blocks=3,
                                     classes=self.classes,
-                                    output_length=2 ** (7 - 1),
+                                    layers=ENCODER_LAYERS,
+                                    output_length=ENCODER_OUTPUT_LENGTH,
                                     dtype=dtype)
 
         decoders = [WaveNetModel(blocks=4,
@@ -62,7 +73,7 @@ class UmtModel(nn.Module):
         return self.encoder, lambda enc: self.post_encode(enc)
 
     def post_encode(self, enc):
-        # latent = F.avg_pool1d(enc, kernel_size=DOWNSAMPLE_FACTOR)
+        latent = F.avg_pool1d(enc, kernel_size=DOWNSAMPLE_FACTOR)
         return enc
 
     def forward(self, input_tuple):
