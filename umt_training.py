@@ -38,7 +38,7 @@ class UmtTrainer:
                  ltype=torch.LongTensor):
         self.model = model
         self.train_model = model
-        self.datasets = dataset
+        self.datasets = datasets
         self.lr = lr
         self.weight_decay = weight_decay
         self.clip = gradient_clipping
