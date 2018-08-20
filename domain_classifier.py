@@ -1,4 +1,6 @@
 import torch.nn as nn
+from audio_data import *
+
 
 class DomainClassifier(nn.Module):
     def __init__(self, classes, bias=True):
