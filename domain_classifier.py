@@ -7,7 +7,7 @@ class DomainClassifier(nn.Module):
         super(DomainClassifier, self).__init__()
 
         self.classes = classes
-        channels = classes // 8
+        channels = classes
 
         self.conv_1 = nn.Conv1d(in_channels=classes,
                                 out_channels=channels,
@@ -36,6 +36,5 @@ class DomainClassifier(nn.Module):
 
         x = F.avg_pool1d(x, kernel_size=x.size()[2])
         x = x.squeeze()  # [batch, D]
-        x = F.normalize(x, dim=1)
 
         return x
