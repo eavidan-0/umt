@@ -47,7 +47,7 @@ class EncoderModel(nn.Module):
             for i in range(layers):
                 # dilations of this layer - padding in order to keep constant channel width
                 padding = math.ceil(dilation * (kernel_size - 1) / 2)
-                kernels.append(kernel_size)
+                self.kernels.append(kernel_size)
                 self.dilated_convs.append(nn.Conv1d(in_channels=channels,
                                                     out_channels=channels,
                                                     kernel_size=kernel_size,
