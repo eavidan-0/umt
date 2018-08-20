@@ -28,8 +28,8 @@ class UmtModel(nn.Module):
                                     dtype=dtype,
                                     bias=False)
 
-        decoders = [WaveNetModel(layers=7,
-                                 blocks=3,
+        decoders = [WaveNetModel(blocks=3,
+                                 layers=10,
                                  dilation_channels=32,
                                  residual_channels=16,
                                  skip_channels=16,
