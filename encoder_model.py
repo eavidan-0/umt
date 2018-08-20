@@ -21,7 +21,7 @@ class EncoderModel(nn.Module):
                  dtype=torch.FloatTensor,
                  bias=True):
 
-        super(WaveNetModel, self).__init__()
+        super(EncoderModel, self).__init__()
 
         self.layers = layers
         self.blocks = blocks
