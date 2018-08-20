@@ -92,17 +92,19 @@ class EncoderModel(nn.Module):
 
             # Step 5: Skip and Residual summation
             # start_idx overcomes dilated_conv with non-integer padding being rounded
-            start_idx = 0 if x.size() == residual.size() else (self.kernels[i]- - 1)
+            start_idx = 0 if x.size() == residual.size() else (
+                self.kernels[i] - - 1)
             x = x + residual[:, :, start_idx:]
 
         output_length = input.size()[2] - self.input_trim
-        assert x.size()[2] == output_length
+        assert x.size()[2] == output_length, "expected encoder output %d, got %r" % (
+            output_length, x.size())
 
         x = self.end_conv(x)
-        latent = F.avg_pool1d(x, kernel_size=output_length//ENC_LEN)
+        latent = F.avg_pool1d(x, kernel_size=output_length // ENC_LEN)
 
-        print("post pool", latent.size())
-        assert latent.size()[2] == ENC_LEN        
+        assert latent.size()[2] == ENC_LEN, "expected latent %d, got %r" % (
+            ENC_LEN, latent.size())
         return latent
 
     def parameter_count(self):
