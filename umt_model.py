@@ -20,12 +20,14 @@ class UmtModel(nn.Module):
                                     bias=True)
 
         decoders = [WaveNetModel(layers=10,
-                                 blocks=4,
+                                 blocks=2,
                                  classes=self.classes,
                                  output_length=SR,
                                  dtype=dtype,
                                  bias=False) for _ in DOMAINS]
         self.decoders = nn.ModuleList(modules=decoders)
+
+        print ('receptive field', self.decoders[0].receptive_field)
 
     def encode(self, input_tuple):
         torch.set_grad_enabled(self.is_training)
