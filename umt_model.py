@@ -27,18 +27,18 @@ class UmtModel(nn.Module):
                                     dtype=dtype,
                                     bias=False)
 
-        decoders = [WaveNetModel(blocks=3,
+        decoders = [WaveNetModel(blocks=2,
                                  layers=10,
                                  dilation_channels=32,
                                  residual_channels=16,
                                  skip_channels=16,
                                  classes=self.classes,
-                                 output_length=SR,
                                  dtype=dtype,
                                  bias=False) for _ in DOMAINS]
         self.decoders = nn.ModuleList(modules=decoders)
 
-        print ('receptive field', self.decoders[0].receptive_field)
+        self.receptive_field = self.decoders[0].receptive_field
+        print ('receptive field', self.receptive_field)
 
     def encode(self, input_tuple):
         torch.set_grad_enabled(self.is_training)
@@ -70,8 +70,9 @@ class UmtModel(nn.Module):
         out = self.decoders[domain_index].forward(upsampled_latent)
         # out = decode_mu(out, self.classes)  # or just expansion?
 
-        # TODO: ahemm....
+        # TODO: ahem
         out = F.interpolate(out, size=SR, mode='nearest')
+
         return out
 
     def parameter_count(self):

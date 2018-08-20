@@ -169,8 +169,8 @@ class WaveNetModel(nn.Module):
 
         # reshape output
         [n, c, l] = x.size()
-        l = self.output_length
-        x = x[:, :, -l:]
+        # l = self.output_length
+        # x = x[:, :, -l:]
         return x
 
     def parameter_count(self):
