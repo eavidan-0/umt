@@ -56,7 +56,7 @@ class UmtTrainer:
                 self.encoder, device_ids=list(range(NUM_GPU)))
 
         self.classifier_optimizer = self.optimizer_type(
-            params=self.domain_classifier.parameters(), lr=10 ** -5, weight_decay=self.weight_decay)
+            params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.model_optimizer = self.optimizer_type(
             params=self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.snapshot_path = snapshot_path
@@ -98,7 +98,7 @@ class UmtTrainer:
                     torch.save(self.model, snapshot_prefix + time_string)
 
             # Shuffle entire batches to ensure same domain index
-            for data in roundrobin(dataloaders):
+            for data in roundrobin(dataloaders, halt_on_first=True):
                 domain_index, x, target = data
 
                 x = Variable(x.type(self.dtype))
@@ -137,8 +137,8 @@ class UmtTrainer:
                 self.model_optimizer.step()
                 step += 1
 
-                print("e %d step %d: loss %.3f classifier_loss %.3f" %
-                      (current_epoch, step, loss, classifier_loss.item()))
+                print("[EPOCH %d; STEP %d]: loss %.3f classifier_loss %.3f    [%r]" %
+                      (current_epoch, step, loss, classifier_loss.item(), DOMAINS[domain_index[0]]))
 
     def decay_lr(self):
         self.lr = self.lr * LR_DECAY
@@ -155,8 +155,8 @@ class UmtTrainer:
 def create_dataloader(dataset, batch_size):
     return torch.utils.data.DataLoader(dataset,
                                        batch_size=batch_size,
-                                       shuffle=False,
-                                       num_workers=4,
+                                       shuffle=True,
+                                       num_workers=0,
                                        drop_last=True,
                                        pin_memory=False)
 
@@ -174,7 +174,7 @@ def grouper(n, iterable):
         yield chunk
 
 
-def roundrobin(iterables):
+def roundrobin(iterables, halt_on_first=False):
     "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
     # Recipe credited to George Sakkis
     num_active = len(iterables)
@@ -184,5 +184,6 @@ def roundrobin(iterables):
             for n in nexts:
                 yield n()
         except StopIteration:
-            num_active -= 1
-            nexts = itertools.cycle(itertools.islice(nexts, num_active))
+            if not halt_on_first:
+                num_active -= 1
+                nexts = itertools.cycle(itertools.islice(nexts, num_active))
