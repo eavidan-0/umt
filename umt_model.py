@@ -15,11 +15,13 @@ class UmtModel(nn.Module):
         self.classes = classes
         self.is_training = train
 
-        self.encoder = EncoderModel(classes=self.classes,
+        self.encoder = EncoderModel(blocks=3,
+                                    layers=10,
+                                    classes=self.classes,
                                     dtype=dtype,
                                     bias=True)
 
-        decoders = [WaveNetModel(layers=10,
+        decoders = [WaveNetModel(layers=8,
                                  blocks=2,
                                  classes=self.classes,
                                  output_length=SR,
