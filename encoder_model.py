@@ -17,6 +17,7 @@ class EncoderModel(nn.Module):
                  blocks=3,
                  layers=10,
                  channels=128,
+                 dilation=2,
                  initial_kernel_size=2,
                  dtype=torch.FloatTensor,
                  bias=True):
@@ -42,7 +43,6 @@ class EncoderModel(nn.Module):
                                     bias=bias)
 
         for b in range(blocks):
-            dilation = 4
             kernel_size = initial_kernel_size
             for i in range(layers):
                 # dilations of this layer - padding in order to keep constant channel width
