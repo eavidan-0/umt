@@ -21,8 +21,7 @@ if use_cuda:
     os.environ['CUDA_VISIBLE_DEVICES'] = str(list(range(NUM_GPU)))[
         1:-1].replace(" ", "")
 
-CONFUSION_LOSS_WEIGHT = 0.01  # they did 0.01
-
+CONFUSION_LOSS_WEIGHT = 10 ** -2
 INIT_LR = 10 ** -3
 LR_DECAY = 0.98
 
@@ -57,7 +56,7 @@ class UmtTrainer:
                 self.encoder, device_ids=list(range(NUM_GPU)))
 
         self.classifier_optimizer = self.optimizer_type(
-            params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+            params=self.domain_classifier.parameters(), lr=10 ** -5, weight_decay=self.weight_decay)
         self.model_optimizer = self.optimizer_type(
             params=self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.snapshot_path = snapshot_path
