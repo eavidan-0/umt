@@ -38,7 +38,8 @@ class UmtModel(nn.Module):
                                     output_length=ENCODER_OUTPUT_LENGTH,
                                     dtype=dtype)
 
-        decoders = [WaveNetModel(blocks=4,
+        decoders = [WaveNetModel(blocks=2,
+                                 layers=5,
                                  classes=self.classes,
                                  output_length=SR,
                                  dtype=dtype) for _ in DOMAINS]
