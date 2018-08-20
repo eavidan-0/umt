@@ -134,8 +134,8 @@ class UmtTrainer:
                 self.model_optimizer.step()
                 step += 1
 
-                print("step %d: loss %.3f classifier_loss %.3f" %
-                      (step, loss, classifier_loss.item()))
+                print("e %d step %d: loss %.3f classifier_loss %.3f" %
+                      (current_epoch, step, loss, classifier_loss.item()))
 
     def decay_lr(self):
         self.lr = self.lr * LR_DECAY

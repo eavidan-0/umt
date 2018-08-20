@@ -6,6 +6,12 @@ import torch
 import torch.nn.functional as F
 import librosa as lr
 
+# Tasks
+# [ ] Max Network size
+# [ ] Encoder output + pooling
+# [ ] Decoder output + mU
+# [ ] Generation?
+
 
 class UmtModel(nn.Module):
     def __init__(self, dtype, classes=256, train=True):
