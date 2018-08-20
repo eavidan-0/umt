@@ -69,7 +69,11 @@ class UmtTrainer:
         self.train_model.train()
         dataloaders = list(
             map(lambda ds: create_dataloader(ds, batch_size), self.datasets))
-        self.snapshot_interval = len(self.dataset) / batch_size
+
+        data_size = sum(map(lambda ds: len(ds) // batch_size * batch_size, self.datasets), 0)
+
+        print ("data length", data_size)
+        self.snapshot_interval = data_size // batch_size
         step = int(start_epoch * self.snapshot_interval)
 
         # return to previous params
@@ -150,6 +154,7 @@ def create_dataloader(dataset, batch_size):
                                        batch_size=batch_size,
                                        shuffle=False,
                                        num_workers=4,
+                                       drop_last=True,
                                        pin_memory=False)
 
 
