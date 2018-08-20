@@ -17,7 +17,7 @@ class EncoderModel(nn.Module):
                  blocks=3,
                  layers=10,
                  channels=128,
-                 dilation=2,
+                 dilation=16,
                  initial_kernel_size=2,
                  dtype=torch.FloatTensor,
                  bias=True):
