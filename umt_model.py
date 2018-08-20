@@ -1,28 +1,11 @@
 from wavenet_model import *
+from encoder_model import *
 from audio_data import *
 import numpy as np
 import torch
 import torch.nn.functional as F
 import librosa as lr
 
-# Umt downsampled by x12.5, but need divisability
-# Nsynth used x32
-DOWNSAMPLE_FACTOR = 40
-ENC_LEN = SR / DOWNSAMPLE_FACTOR
-if not ENC_LEN == int(ENC_LEN):
-    raise ValueError("SR not divisable") 
-
-ENC_LEN = int(ENC_LEN)
-
-ENCODER_LAYERS = 8
-ENCODER_OUTPUT_LENGTH = 2 ** (ENCODER_LAYERS - 1)
-ENC_LEN = 64
-
-DOWNSAMPLE_FACTOR = ENCODER_OUTPUT_LENGTH // ENC_LEN
-if not DOWNSAMPLE_FACTOR == int(DOWNSAMPLE_FACTOR):
-    raise ValueError("ENC_LEN not divisable") 
-
-DOWNSAMPLE_FACTOR = int(DOWNSAMPLE_FACTOR)
 
 class UmtModel(nn.Module):
     def __init__(self, dtype, classes=256, train=True):
@@ -32,10 +15,7 @@ class UmtModel(nn.Module):
         self.classes = classes
         self.is_training = train
 
-        self.encoder = WaveNetModel(blocks=3,
-                                    classes=self.classes,
-                                    layers=ENCODER_LAYERS,
-                                    output_length=ENCODER_OUTPUT_LENGTH,
+        self.encoder = EncoderModel(classes=self.classes,
                                     dtype=dtype)
 
         decoders = [WaveNetModel(blocks=2,
@@ -47,13 +27,6 @@ class UmtModel(nn.Module):
 
         d = self.decoders[0]
         e = self.encoder
-
-        self.receptive_field = [e.receptive_field, d.receptive_field]
-        self.output_length = [e.output_length, d.output_length]
-
-        # self.item_length = model.receptive_field[0] + model.output_length[1] - 1
-        self.item_length = SR
-        self.target_length = SR
 
     def encode(self, input_tuple):
         torch.set_grad_enabled(self.is_training)
@@ -70,17 +43,10 @@ class UmtModel(nn.Module):
         enc = self.encoder.forward(input)
         return self.post_encode(enc)
 
-    def get_encoder(self):
-        return self.encoder, lambda enc: self.post_encode(enc)
-
-    def post_encode(self, enc):
-        latent = F.avg_pool1d(enc, kernel_size=DOWNSAMPLE_FACTOR)
-        return enc
-
     def forward(self, input_tuple):
         domain_index_tensor, input, _ = input_tuple
         domain_index = domain_index_tensor.data[0]
-        
+
         latent = self.encode(input_tuple)
 
         # Upsample back to original sampling rate
@@ -88,9 +54,9 @@ class UmtModel(nn.Module):
         upsampled_latent = F.interpolate(latent, size=SR, mode='nearest')
 
         # Run through domain decoder
-        upsampled_latent = mu_law_encoding(upsampled_latent)
+        upsampled_latent = quantize_data(upsampled_latent, self.classes)
         out = self.decoders[domain_index].forward(upsampled_latent)
-        out = mu_law_expansion(out)
+        out = decode_mu(out, self.classes)  # or just expansion
 
         # TODO: mu-law again?
         return out

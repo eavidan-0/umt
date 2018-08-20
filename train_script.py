@@ -1,12 +1,15 @@
 from umt_model import *
 from UmtDataset import *
 from audio_data import *
-from wavenet_training import *
+from umt_training import *
 from model_logging import *
 from scipy.io import wavfile
 
 from time import sleep
 sleep(2)
+
+DATASET_SOURCE_BASE = "/home/eavidan/Music/"
+DATASET_LOCATION = "./datasets/"
 
 dtype = torch.FloatTensor
 ltype = torch.LongTensor
@@ -23,11 +26,7 @@ if use_cuda:
         1:-1].replace(" ", "")
 
 model = UmtModel(dtype)
-print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
-
-print ('item_length', model.item_length)
-print ('target_length', model.target_length)
 
 # reload snapshot
 start_epoch = 0
@@ -37,32 +36,27 @@ if use_cuda:
     print("move model to gpu")
     model.cuda()
 
-data = UmtDataset(item_length=model.item_length,
-                  target_length=model.target_length,
-                  train=True,
-                  test_stride=5000000)
+datasets = []
 
+for domain_index in range(len(DOMAINS)):
+    domain = DOMAINS[domain_index]
+    data = WavenetDataset(dataset_file=DATASET_LOCATION + domain + '.npz',
+                          item_length=SR,
+                          target_length=SR,
+                          file_location=DATASET_SOURCE_BASE + domain,
+                          domain_index=domain_index,
+                          dtype=dtype,
+                          train=True,
+                          test_stride=5000000)
 
-def generate_and_log_samples(step):
-    pass
+    datasets.append(data)
 
-
-logger = TensorboardLogger(log_interval=200,
-                           validation_interval=400,
-                           generate_interval=800,
-                           generate_function=generate_and_log_samples,
-                           log_dir="logs/chaconne_model")
-
-trainer = WavenetTrainer(model=model,
-                         dataset=data,
-                         lr=0.0001,
-                         weight_decay=0.0,
-                         snapshot_path='snapshots',
-                         snapshot_name='umt',
-                         snapshot_interval=1000,
-                         logger=logger,
-                         dtype=dtype,
-                         ltype=ltype)
+trainer = UmtTrainer(model=model,
+                     datasets=datasets,
+                     snapshot_path='snapshots',
+                     snapshot_name='umt',
+                     dtype=dtype,
+                     ltype=ltype)
 
 print('start training...')
 trainer.train(batch_size=BATCH_SIZE,

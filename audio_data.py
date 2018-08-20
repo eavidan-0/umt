@@ -14,6 +14,7 @@ from random import random, randint
 DOMAINS = ["Ed Sheeran", "Metallica", "Bon Jovi", "Coldplay"]
 DOMAIN_IDS = list(range(len(DOMAINS)))
 SR = 16000
+BATCH_SIZE = 16
 
 class WavenetDataset(torch.utils.data.Dataset):
     def __init__(self,
@@ -136,8 +137,7 @@ class WavenetDataset(torch.utils.data.Dataset):
         # TODO: this should have been before mu-law...
         if self.train:
             # Reverse quantization and encoding
-            y = (sample / self.classes) * 2. - 1
-            y = mu_law_expansion(y, self.classes)
+            y = decode_mu(sample, self.classes)
 
             seg_length = int(self.sampling_rate *
                              (random() * 0.25 + 0.25))  # 1/4 -> 1/2
@@ -177,6 +177,10 @@ def quantize_data(data, classes, mu=True):
     quantized = np.digitize(x, bins) - 1
     return quantized
 
+def decode_mu(data, classes):
+    y = (data / classes) * 2. - 1
+    y = mu_law_expansion(y, classes)
+    return y;
 
 def list_all_audio_files(location):
     audio_files = []

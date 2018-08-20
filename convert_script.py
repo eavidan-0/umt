@@ -1,11 +1,10 @@
 from umt_model import *
-from UmtDataset import *
 import librosa
 from wavenet_model import *
 import itertools
 
 from audio_data import WavenetDataset
-from wavenet_training import *
+from umt_training import *
 
 import torch
 
@@ -29,11 +28,8 @@ if use_cuda:
 model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 model.train = False
 
-item_length = model.item_length
-target_length = model.target_length
 classes = model.classes
 
-print('receptive field: ', model.receptive_field)
 print('parameter count: ', model.parameter_count())
 
 if use_cuda:
@@ -71,8 +67,8 @@ for in_file in input_files:
     for domain_index in range(len(DOMAINS)):
         # Important: this is a wavenet dataset for a single domain
         dataset = WavenetDataset(dataset_file=GENRATION_BASE + filename + '.npz',
-                                 item_length=item_length,
-                                 target_length=target_length,
+                                 item_length=SR,
+                                 target_length=SR,
                                  file_location=in_file,
                                  train=False,
                                  domain_index=domain_index,
@@ -89,22 +85,15 @@ for in_file in input_files:
         total = 16 // BATCH_SIZE
         print (total, "samples")
 
-        def prog_callback(x):
-            i += 1
-            print(str(100.0 * i / total) + "% generated")
-            return x
-
         data = map(data_to_type, iter(dataloader))
         generated = map(model.forward, iter(data))
-        # generated = map(prog_callback, generated)
         generated = map(lambda x: convert_output_to_signal(
             x, classes).flatten(), generated)
         generated = list(itertools.islice(generated, total))
         generated = np.concatenate(generated)
 
         # convert data to signal...
-        generated = (generated / classes) * 2. - 1
-        generated = mu_law_expansion(generated, classes)
+        generated = decode_mu(generated, classes)
 
         out_path = GENERATION_OUTPUTS + "/" + filename + \
             '.' + DOMAINS[domain_index].replace(" ", "") + '.wav'
