@@ -14,10 +14,10 @@ PRE_POOL_LENGTH = ENC_LEN * POOL_KERNEL
 class EncoderModel(nn.Module):
     def __init__(self,
                  classes,
+                 dilation,
                  blocks=3,
                  layers=10,
                  channels=128,
-                 dilation=4,
                  initial_kernel_size=2,
                  dtype=torch.FloatTensor,
                  bias=True):
