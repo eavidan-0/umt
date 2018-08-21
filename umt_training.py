@@ -88,8 +88,6 @@ class UmtTrainer:
         for current_epoch in range(start_epoch, epochs):
             print("epoch", current_epoch)
             if current_epoch > start_epoch:
-                self.decay_lr()
-
                 time_string = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
                 torch.save(self.model, snapshot_prefix + time_string)
 
@@ -132,6 +130,9 @@ class UmtTrainer:
                         self.train_model.parameters(), self.clip)
                 self.model_optimizer.step()
                 step += 1
+
+                if step % 1000 == 0:
+                    self.decay_lr()
 
                 print("[EPOCH %d; STEP %d]: loss %.3f classifier_loss %.3f    [%r]" %
                       (current_epoch, step, loss, classifier_loss.item(), DOMAINS[domain_index[0]]))

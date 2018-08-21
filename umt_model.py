@@ -29,6 +29,7 @@ class UmtModel(nn.Module):
 
         decoders = [WaveNetModel(blocks=4,
                                  layers=10,
+                                 output_length=SR,
                                  dilation_channels=32,
                                  residual_channels=16,
                                  skip_channels=16,
@@ -52,7 +53,6 @@ class UmtModel(nn.Module):
                    ), "Mixed domain batch encountered"
 
         # Run through encoder
-        input = mu_law_decode(input, self.classes)
         enc = self.encoder(input)
         return enc
 
@@ -64,21 +64,14 @@ class UmtModel(nn.Module):
 
         # Upsample back to original sampling rate
         upsampled_latent = F.interpolate(latent, size=SR, mode='nearest')
-        decoder_input = upsampled_latent
 
         # Run through domain decoder
         # TODO: mu here or in dataset?
-        decoder_input = torch.sigmoid(decoder_input) 
-        decoder_input=mu_law_encode(decoder_input)
-        out = self.decoders[domain_index].forward(decoder_input.type(self.dtype))
+        out = self.decoders[domain_index].forward(upsampled_latent)
 
         # TODO: ahem? mu? sampling rate? what what?
         out = F.interpolate(out, size=SR, mode='nearest')
-        
-        out = torch.sigmoid(out) 
-        out = mu_law_decode(out, self.classes)
-
-        return mu_law_encode(out, self.classes).type(self.dtype)
+        return out
 
 
     def parameter_count(self):
