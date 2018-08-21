@@ -152,7 +152,7 @@ def create_dataloader(dataset, batch_size):
     return torch.utils.data.DataLoader(dataset,
                                        batch_size=batch_size,
                                        shuffle=True,
-                                       num_workers=0,
+                                       num_workers=4,
                                        drop_last=True,
                                        pin_memory=False)
 
