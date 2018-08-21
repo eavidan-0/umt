@@ -99,7 +99,7 @@ class UmtTrainer:
 
                 x = Variable(x.type(self.dtype))
                 # target = Variable(target.view(-1).type(self.ltype))
-                target = Variable(target.type(self.ltype)).squeeze()
+                target = Variable(target.type(self.dtype)).squeeze()
                 domain_index = Variable(domain_index.type(self.ltype))
 
                 data = (domain_index, x, target)

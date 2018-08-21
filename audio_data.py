@@ -132,10 +132,12 @@ class WavenetDataset(torch.utils.data.Dataset):
             sample2 = file2[:end_position_in_next_file]
             sample = np.concatenate((sample1, sample2))
 
+        # Reverse quantization and encoding
+        sample = decode_mu(sample, self.classes)
+
         # Only if training: Pitch modulation
         if self.train:
-            # Reverse quantization and encoding
-            y = decode_mu(sample, self.classes)
+            y = sample
 
             seg_length = int(self.sampling_rate *
                              (random() * 0.25 + 0.25))  # 1/4 -> 1/2
@@ -147,7 +149,7 @@ class WavenetDataset(torch.utils.data.Dataset):
                 y[s:e], sr=self.sampling_rate, n_steps=n_steps)
             y[s:e] = np.clip(shifted, -1, 1)
 
-            sample = quantize_data(y, self.classes, mu=True)
+            # sample = quantize_data(y, self.classes, mu=True)
 
         example = torch.from_numpy(sample).type(torch.LongTensor)
         input = example[:self._item_length].unsqueeze(0)

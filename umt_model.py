@@ -67,6 +67,7 @@ class UmtModel(nn.Module):
 
         # Run through domain decoder
         # TODO: mu here or in dataset?
+        decoder_input = mu_law_encode(decoder_input, self.classes)
         out = self.decoders[domain_index].forward(decoder_input)
 
         # TODO: ahem? mu? sampling rate? what what?
