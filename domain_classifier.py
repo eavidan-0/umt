@@ -7,20 +7,18 @@ class DomainClassifier(nn.Module):
         super(DomainClassifier, self).__init__()
 
         self.classes = classes
-        channels_1 = 2 ** (len(DOMAINS) + 1)
-        channels_2 = channels_1 //  2
 
         self.conv_1 = nn.Conv1d(in_channels=classes,
-                                out_channels=channels_1,
+                                out_channels=classes,
                                 kernel_size=2,
                                 bias=bias)
 
-        self.conv_2 = nn.Conv1d(in_channels=channels_1,
-                                out_channels=channels_2,
+        self.conv_2 = nn.Conv1d(in_channels=classes,
+                                out_channels=classes,
                                 kernel_size=2,
                                 bias=bias)
 
-        self.conv_3 = nn.Conv1d(in_channels=channels_2,
+        self.conv_3 = nn.Conv1d(in_channels=classes,
                                 out_channels=len(DOMAINS),
                                 kernel_size=2,
                                 bias=bias)
