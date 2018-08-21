@@ -90,12 +90,8 @@ class UmtTrainer:
             if current_epoch > start_epoch:
                 self.decay_lr()
 
-                if self.snapshot_path is None:
-                    continue
-
-                    time_string = time.strftime(
-                        "%Y-%m-%d_%H-%M", time.gmtime())
-                    torch.save(self.model, snapshot_prefix + time_string)
+                time_string = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
+                torch.save(self.model, snapshot_prefix + time_string)
 
             # Shuffle entire batches to ensure same domain index
             for data in roundrobin(dataloaders, halt_on_first=True):
@@ -186,6 +182,6 @@ def roundrobin(iterables, halt_on_first=False):
         except StopIteration:
             if halt_on_first:
                 return
-                
+
             num_active -= 1
             nexts = itertools.cycle(itertools.islice(nexts, num_active))
