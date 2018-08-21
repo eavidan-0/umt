@@ -95,8 +95,8 @@ class EncoderModel(nn.Module):
         x = self.end_conv(x)
         
         # TODO: wtf?
-        # latent = F.avg_pool1d(x, kernel_size=output_length // ENC_LEN)
-        latent = F.avg_pool1d(x, kernel_size=POOL_KERNEL)
+        latent = F.avg_pool1d(x, kernel_size=output_length // ENC_LEN)
+        # latent = F.avg_pool1d(x, kernel_size=POOL_KERNEL)
 
         # assert latent.size()[2] == ENC_LEN, "expected latent %d, got %r" % (
             # ENC_LEN, latent.size())

@@ -73,7 +73,8 @@ class UmtTrainer:
         dataloaders = list(
             map(lambda ds: create_dataloader(ds, batch_size), self.datasets))
 
-        data_size = sum(map(lambda ds: len(ds) // batch_size * batch_size, self.datasets), 0)
+        data_size = sum(map(lambda ds: len(ds) // batch_size *
+                            batch_size, self.datasets), 0)
 
         print ("data length", data_size)
         self.snapshot_interval = data_size // batch_size
@@ -152,7 +153,7 @@ class UmtTrainer:
 def create_dataloader(dataset, batch_size):
     return torch.utils.data.DataLoader(dataset,
                                        batch_size=batch_size,
-                                       shuffle=True,
+                                       shuffle=True,  # TODO: maybe batches?
                                        num_workers=4,
                                        drop_last=True,
                                        pin_memory=False)
