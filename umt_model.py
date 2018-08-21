@@ -52,6 +52,7 @@ class UmtModel(nn.Module):
                    ), "Mixed domain batch encountered"
 
         # Run through encoder
+        input = mu_law_decode(input, self.classes)
         enc = self.encoder(input)
         return enc
 
@@ -67,12 +68,12 @@ class UmtModel(nn.Module):
 
         # Run through domain decoder
         # TODO: mu here or in dataset?
-        # decoder_input=mu_law_encode(decoder_input)
+        decoder_input=mu_law_encode(decoder_input)
         out = self.decoders[domain_index].forward(decoder_input)
 
         # TODO: ahem? mu? sampling rate? what what?
         out = F.interpolate(out, size=SR, mode='nearest')
-        # out = mu_law_decode(out, self.classes)
+        out = mu_law_decode(out, self.classes)
 
         return out
 
