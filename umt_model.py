@@ -78,7 +78,7 @@ class UmtModel(nn.Module):
         out = F.sigmoid(out) 
         out = mu_law_decode(out, self.classes)
 
-        return mu_law_encode(out, self.classes).type(self.ltype)
+        return mu_law_encode(out, self.classes)
 
 
     def parameter_count(self):
