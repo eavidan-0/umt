@@ -89,7 +89,7 @@ for in_file in input_files:
         generated = np.concatenate(generated)
 
         # convert data to signal...
-        # generated = decode_mu(generated, classes)
+        generated = decode_mu(generated, classes)
 
         out_path = GENERATION_OUTPUTS + "/" + filename + \
             '.' + DOMAINS[domain_index].replace(" ", "") + '.wav'
