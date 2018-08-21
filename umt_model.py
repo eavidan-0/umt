@@ -72,7 +72,7 @@ class UmtModel(nn.Module):
         # TODO: ahem
         out = F.interpolate(out, size=SR, mode='nearest')
         out = mu_law_encode(out, self.classes)
-s
+
         return out
 
     def parameter_count(self):
