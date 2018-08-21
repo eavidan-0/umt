@@ -184,6 +184,8 @@ def roundrobin(iterables, halt_on_first=False):
             for n in nexts:
                 yield n()
         except StopIteration:
-            if not halt_on_first:
-                num_active -= 1
-                nexts = itertools.cycle(itertools.islice(nexts, num_active))
+            if halt_on_first:
+                return
+                
+            num_active -= 1
+            nexts = itertools.cycle(itertools.islice(nexts, num_active))
