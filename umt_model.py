@@ -14,11 +14,10 @@ import librosa as lr
 
 
 class UmtModel(nn.Module):
-    def __init__(self, dtype, ltype, classes=256, train=True):
+    def __init__(self, dtype, classes=256, train=True):
         super(UmtModel, self).__init__()
 
         self.dtype = dtype
-        self.ltype = ltype
         self.classes = classes
         self.is_training = train
 
@@ -69,17 +68,17 @@ class UmtModel(nn.Module):
 
         # Run through domain decoder
         # TODO: mu here or in dataset?
-        decoder_input = F.sigmoid(decoder_input) 
+        decoder_input = torch.sigmoid(decoder_input) 
         decoder_input=mu_law_encode(decoder_input)
         out = self.decoders[domain_index].forward(decoder_input.type(self.dtype))
 
         # TODO: ahem? mu? sampling rate? what what?
         out = F.interpolate(out, size=SR, mode='nearest')
         
-        out = F.sigmoid(out) 
+        out = torch.sigmoid(out) 
         out = mu_law_decode(out, self.classes)
 
-        return mu_law_encode(out, self.classes).type(self.ltype)
+        return mu_law_encode(out, self.classes).type(self.dtype)
 
 
     def parameter_count(self):
