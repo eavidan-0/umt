@@ -66,7 +66,9 @@ class UmtModel(nn.Module):
         decoder_input = upsampled_latent
 
         # Run through domain decoder
-        out = self.decoders[domain_index].forward(upsampled_latent)
+        # TODO: mu here or in dataset?
+        decoder_input=mu_law_encode(decoder_input)
+        out = self.decoders[domain_index].forward(decoder_input)
 
         # TODO: ahem? mu? sampling rate? what what?
         out = F.interpolate(out, size=SR, mode='nearest')
