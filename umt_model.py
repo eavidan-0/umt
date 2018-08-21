@@ -68,14 +68,14 @@ class UmtModel(nn.Module):
 
         # Run through domain decoder
         # TODO: mu here or in dataset?
-        decoder_input = F.normalize(decoder_input) 
+        decoder_input = F.sigmoid(decoder_input) 
         decoder_input=mu_law_encode(decoder_input)
         out = self.decoders[domain_index].forward(decoder_input.type(self.dtype))
 
         # TODO: ahem? mu? sampling rate? what what?
         out = F.interpolate(out, size=SR, mode='nearest')
         
-        out = F.normalize(out) 
+        out = F.sigmoid(out) 
         out = mu_law_decode(out, self.classes)
 
         return mu_law_encode(out, self.classes).type(self.ltype)
