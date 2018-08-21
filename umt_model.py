@@ -63,16 +63,16 @@ class UmtModel(nn.Module):
 
         # Upsample back to original sampling rate
         upsampled_latent = F.interpolate(latent, size=SR, mode='nearest')
+        decoder_input = upsampled_latent
 
         # Run through domain decoder
-        # TODO: Mu input and output
-        # upsampled_latent = quantize_data(upsampled_latent, self.classes)
+        decoder_input = mu_law_encode(decoder_input, self.classes)
         out = self.decoders[domain_index].forward(upsampled_latent)
-        # out = decode_mu(out, self.classes)  # or just expansion?
 
         # TODO: ahem
         out = F.interpolate(out, size=SR, mode='nearest')
-
+        out = mu_law_encode(out, self.classes)
+s
         return out
 
     def parameter_count(self):
