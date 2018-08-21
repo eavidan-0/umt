@@ -20,7 +20,7 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
-model = UmtModel(dtype)
+model = UmtModel(dtype, ltype)
 print('parameter count: ', model.parameter_count())
 
 # reload snapshot

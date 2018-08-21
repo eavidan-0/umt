@@ -14,10 +14,11 @@ import librosa as lr
 
 
 class UmtModel(nn.Module):
-    def __init__(self, dtype, classes=256, train=True):
+    def __init__(self, dtype, ltype, classes=256, train=True):
         super(UmtModel, self).__init__()
 
         self.dtype = dtype
+        self.ltype = ltype
         self.classes = classes
         self.is_training = train
 
@@ -78,7 +79,7 @@ class UmtModel(nn.Module):
         out = F.sigmoid(out) 
         out = mu_law_decode(out, self.classes)
 
-        return mu_law_encode(out, self.classes)
+        return mu_law_encode(out, self.classes).type(self.ltype)
 
 
     def parameter_count(self):
