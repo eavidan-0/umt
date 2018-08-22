@@ -29,7 +29,7 @@ class UmtModel(nn.Module):
 
         decoders = [WaveNetModel(blocks=2,
                                  layers=10,
-                                 output_length=SR,
+                                 output_length=SR / 4,
                                  dilation_channels=32,
                                  residual_channels=16,
                                  skip_channels=16,
