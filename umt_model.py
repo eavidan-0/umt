@@ -27,7 +27,7 @@ class UmtModel(nn.Module):
                                     dtype=dtype,
                                     bias=False)
 
-        decoders = [WaveNetModel(blocks=4,
+        decoders = [WaveNetModel(blocks=3s,
                                  layers=10,
                                  output_length=SR,
                                  dilation_channels=32,
