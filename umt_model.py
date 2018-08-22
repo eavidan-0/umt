@@ -32,7 +32,7 @@ class UmtModel(nn.Module):
                                  output_length=SR,
                                  dilation_channels=32,
                                  residual_channels=16,
-                                 skip_channels=512,
+                                 skip_channels=16,
                                  classes=self.classes,
                                  dtype=dtype,
                                  bias=False) for _ in DOMAINS]
