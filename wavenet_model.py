@@ -182,7 +182,7 @@ class WaveNetModel(nn.Module):
             input = x
 
         # reshape output
-        out = torch.cat(out, dim=2s)
+        out = torch.cat(out, dim=2)
         out = out[:, :, -self.output_length:]
         print out.size()
         return out
