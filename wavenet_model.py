@@ -168,11 +168,12 @@ class WaveNetModel(nn.Module):
 
     def forward(self, input):
         out = []
-        l = 2 ** (self.layers - 1);
+        l = 2 ** (self.layers - 1)
 
         for _ in range(ceil(self.output_length / l)):
             # Upsample back to original sampling rate
-            input  = F.interpolate(input, size=self.output_length, mode='nearest')
+            input = F.interpolate(
+                input, size=self.output_length, mode='nearest')
 
             x = self.wavenet(input)
             x = x[:, :, -l:]
@@ -184,7 +185,6 @@ class WaveNetModel(nn.Module):
         # reshape output
         out = torch.cat(out, dim=2)
         out = out[:, :, -self.output_length:]
-        print (out.size())
         return out
 
     def parameter_count(self):
