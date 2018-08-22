@@ -141,7 +141,7 @@ class WaveNetModel(nn.Module):
             (dilation, init_dilation) = self.dilations[i]
 
             residual = dilate(x, dilation, init_dilation)
-            condition = dilate(input, input.size(2) // residual.size(2), 1)
+            print (residual.size())
 
             # dilated convolution
             filter = self.filter_convs[i](residual)
@@ -162,8 +162,7 @@ class WaveNetModel(nn.Module):
             skip = s + skip
 
             x = self.residual_convs[i](x)
-            condition = residual + self.condition_convs[i](condition)[:, :, -residual.size(2):]
-            x = x + condition[:, :, (self.kernel_size - 1):]
+            x = x + residual[:, :, (self.kernel_size - 1):]
 
         x = F.relu(skip)
         x = F.relu(self.end_conv_1(x))
