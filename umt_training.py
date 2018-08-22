@@ -81,7 +81,7 @@ class UmtTrainer:
         step = int(start_epoch * self.snapshot_interval)
 
         # return to previous params
-        for _ in range(start_epoch):
+        for _ in range(step // 1000):
             self.decay_lr()
 
         snapshot_prefix = self.snapshot_path + '/' + self.snapshot_name + '_'

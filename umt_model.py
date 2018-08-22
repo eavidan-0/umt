@@ -71,8 +71,10 @@ class UmtModel(nn.Module):
 
         # TODO: ahem? mu? sampling rate? what what?
         out = F.interpolate(out, size=SR, mode='nearest')
+        out = torch.clamp(out, 0, self.classes)
+        out = mu_law_decode(out, self.classes)
+        out = mu_law_encode(out, self.classes)
         return out
-
 
     def parameter_count(self):
         par = list(self.parameters())
