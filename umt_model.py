@@ -29,7 +29,7 @@ class UmtModel(nn.Module):
 
         decoders = [WaveNetModel(blocks=4,
                                  layers=10,
-                                 output_length=2 ** (10 - 1),
+                                 output_length=SR,
                                  dilation_channels=32,
                                  residual_channels=16,
                                  skip_channels=512,
@@ -62,12 +62,9 @@ class UmtModel(nn.Module):
 
         latent = self.encode(input_tuple)
 
-        # Upsample back to original sampling rate
-        upsampled_latent = F.interpolate(latent, size=SR, mode='nearest')
-
         # Run through domain decoder
         # TODO: mu here or in dataset?
-        out = self.decoders[domain_index].forward(upsampled_latent)
+        out = self.decoders[domain_index].forward(latent)
 
         # TODO: ahem? mu? sampling rate? what what?
         out = F.interpolate(out, size=SR, mode='nearest')

@@ -4,6 +4,8 @@ import time
 from wavenet_modules import *
 from audio_data import *
 
+from math import ceil
+
 
 class WaveNetModel(nn.Module):
     """
@@ -165,13 +167,24 @@ class WaveNetModel(nn.Module):
         return x
 
     def forward(self, input):
-        x = self.wavenet(input)
+        out = []
+        l = 2 ** (self.layers - 1);
+
+        for _ in range(ceil(self.output_length / l)):
+            # Upsample back to original sampling rate
+            input  = F.interpolate(input, size=self.output_length, mode='nearest')
+
+            x = self.wavenet(input)
+            x = x[:, :, -l:]
+            out.append(x)
+
+            # Autoregressive
+            input = x
 
         # reshape output
-        [n, c, l] = x.size()
-        l = self.output_length
-        x = x[:, :, -l:]
-        return x
+        out = torch.cat(out)
+        out = out[:, :, -self.output_length:]
+        return out
 
     def parameter_count(self):
         par = list(self.parameters())
