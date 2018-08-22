@@ -162,7 +162,7 @@ class WaveNetModel(nn.Module):
             skip = s + skip
 
             x = self.residual_convs[i](x)
-            condition = residual + self.condition_convs[i](condition)
+            condition = residual + self.condition_convs[i](condition)[:, :, -residual.size(2):]
             x = x + condition[:, :, (self.kernel_size - 1):]
 
         x = F.relu(skip)
