@@ -182,8 +182,9 @@ class WaveNetModel(nn.Module):
             input = x
 
         # reshape output
-        out = torch.cat(out)
+        out = torch.cat(out, dim=2s)
         out = out[:, :, -self.output_length:]
+        print out.size()
         return out
 
     def parameter_count(self):
