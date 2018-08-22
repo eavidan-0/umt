@@ -22,7 +22,7 @@ class UmtModel(nn.Module):
         self.is_training = train
 
         self.encoder = EncoderModel(blocks=2,
-                                    layers=10,
+                                    layers=6,
                                     classes=self.classes,
                                     dtype=dtype,
                                     bias=False)
