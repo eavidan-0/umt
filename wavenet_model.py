@@ -60,7 +60,6 @@ class WaveNetModel(nn.Module):
         self.gate_convs = nn.ModuleList()
         self.residual_convs = nn.ModuleList()
         self.skip_convs = nn.ModuleList()
-        self.condition_convs = nn.ModuleList()
 
         # 1x1 convolution to create channels
         self.start_conv = nn.Conv1d(in_channels=self.classes,
@@ -87,10 +86,6 @@ class WaveNetModel(nn.Module):
                                                  bias=bias))
 
                 # 1x1 convolution for residual connection
-                self.condition_convs.append(nn.Conv1d(in_channels=classes,
-                                                      out_channels=residual_channels,
-                                                      kernel_size=1,
-                                                      bias=bias))
                 self.residual_convs.append(nn.Conv1d(in_channels=dilation_channels,
                                                      out_channels=residual_channels,
                                                      kernel_size=1,
@@ -140,8 +135,7 @@ class WaveNetModel(nn.Module):
 
             (dilation, init_dilation) = self.dilations[i]
 
-            residual = dilate(x, dilation, init_dilation)
-            print (residual.size())
+            residual = dilate(x, dilation, init_dilation, i)
 
             # dilated convolution
             filter = self.filter_convs[i](residual)
