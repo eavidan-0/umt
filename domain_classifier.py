@@ -10,26 +10,26 @@ class DomainClassifier(nn.Module):
 
         self.conv_1 = nn.Conv1d(in_channels=classes,
                                 out_channels=classes,
-                                kernel_size=2,
+                                kernel_size=8,
                                 bias=bias)
 
         self.conv_2 = nn.Conv1d(in_channels=classes,
                                 out_channels=classes,
-                                kernel_size=2,
+                                kernel_size=8,
                                 bias=bias)
 
         self.conv_3 = nn.Conv1d(in_channels=classes,
                                 out_channels=len(DOMAINS),
-                                kernel_size=2,
+                                kernel_size=8,
                                 bias=bias)
 
     def forward(self, latent):
         x = latent
 
         x = self.conv_1(x)
-        x = F.elu(x, alpha=1.0)
+        x = F.elu(x, alpha=0.9)
         x = self.conv_2(x)
-        x = F.elu(x, alpha=1.0)
+        x = F.elu(x, alpha=0.8)
         x = self.conv_3(x)
         x = F.elu(x, alpha=0.7)
 
