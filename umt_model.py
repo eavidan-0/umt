@@ -60,6 +60,7 @@ class UmtModel(nn.Module):
         domain_index = domain_index_tensor.data[0]
 
         latent = self.encode(input_tuple)
+        latent = F.interpolate(latent, size=SR, mode='nearest')
 
         # Run through domain decoder
         # TODO: mu here or in dataset?
