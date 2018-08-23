@@ -36,7 +36,6 @@ class WaveNetModel(nn.Module):
                  skip_channels,
                  end_channels=256,
                  classes=256,
-                 output_length=32,
                  kernel_size=2,
                  dtype=torch.FloatTensor,
                  bias=False):
@@ -114,8 +113,6 @@ class WaveNetModel(nn.Module):
                                     kernel_size=1,
                                     bias=True)
 
-        # self.output_length = 2 ** (layers - 1)
-        self.output_length = output_length
         self.receptive_field = receptive_field
 
     def wavenet(self, input):
@@ -167,24 +164,10 @@ class WaveNetModel(nn.Module):
         return x
 
     def forward(self, input):
-        out = []
+        x = self.wavenet(input)
+        
         l = 2 ** (self.layers - 1)
-
-        for _ in range(ceil(self.output_length / l)):
-            # Upsample back to original sampling rate
-            input = F.interpolate(
-                input, size=self.output_length, mode='nearest')
-
-            x = self.wavenet(input)
-            x = x[:, :, -l:]
-            out.append(x)
-
-            # Autoregressive
-            input = x
-
-        # reshape output
-        out = torch.cat(out, dim=2)
-        out = out[:, :, -self.output_length:]
+        out = x[:, :, -l:]
         return out
 
     def parameter_count(self):
