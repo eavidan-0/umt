@@ -46,17 +46,13 @@ class UmtTrainer:
         self.weight_decay = weight_decay
         self.clip = gradient_clipping
         self.optimizer_type = optimizer
-        self.domain_classifier = DomainClassifier(classes=model.classes)
         self.encoder = model.encoder
         if use_cuda:
             self.train_model = nn.parallel.DataParallel(
                 self.train_model, device_ids=list(range(NUM_GPU)))
-            self.domain_classifier = self.domain_classifier.cuda()
             self.encoder = nn.parallel.DataParallel(
                 self.encoder, device_ids=list(range(NUM_GPU)))
 
-        self.classifier_optimizer = self.optimizer_type(
-            params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.model_optimizer = self.optimizer_type(
             params=self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.snapshot_path = snapshot_path
@@ -64,6 +60,8 @@ class UmtTrainer:
         self.snapshot_interval = snapshot_interval
         self.dtype = dtype
         self.ltype = ltype
+
+        self.create_domain_classifier()
 
     def train(self,
               batch_size,
@@ -88,9 +86,13 @@ class UmtTrainer:
 
         for current_epoch in range(start_epoch, epochs):
             print("epoch", current_epoch)
+
             if current_epoch > start_epoch:
                 time_string = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
                 torch.save(self.model, snapshot_prefix + time_string)
+
+            # New classifier - better confusion?
+            self.create_domain_classifier()
 
             # Shuffle entire batches to ensure same domain index
             for data in roundrobin(dataloaders, halt_on_first=True):
@@ -149,6 +151,13 @@ class UmtTrainer:
         for param_group in optimizer.param_groups:
             param_group['lr'] = self.lr
 
+    def create_domain_classifier(self):
+        self.domain_classifier = DomainClassifier(classes=self.model.classes)
+        if use_cuda:
+            self.domain_classifier = self.domain_classifier.cuda()
+
+        self.classifier_optimizer = self.optimizer_type(
+            params=self.domain_classifier.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
 def create_dataloader(dataset, batch_size):
     return torch.utils.data.DataLoader(dataset,
