@@ -147,7 +147,7 @@ class UmtTrainer:
 
     def set_lr(self, optimizer):
         for param_group in optimizer.param_groups:
-            param_group['lr'] *= self.lr
+            param_group['lr'] = self.lr
 
 
 def create_dataloader(dataset, batch_size):
