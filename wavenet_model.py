@@ -155,7 +155,7 @@ class WaveNetModel(nn.Module):
         out = x[:, :, -SR:]
         return out
 
-    def _condition(x, encoding):
+    def _condition(self, x, encoding):
         """Condition the input on the encoding.
         Args:
         x: The [mb, length, channels] float tensor input.
