@@ -21,10 +21,11 @@ class UmtModel(nn.Module):
         self.classes = classes
         self.is_training = train
 
+        # TODO: kernel size 3?
         self.encoder = EncoderModel(blocks=3,
                                     layers=10,
                                     classes=self.classes,
-                                    kernel_size=3,
+                                    kernel_size=2,
                                     dtype=dtype,
                                     bias=False)
 
@@ -34,7 +35,7 @@ class UmtModel(nn.Module):
                                  residual_channels=256,
                                  skip_channels=512,
                                  classes=self.classes,
-                                 kernel_size=3,
+                                 kernel_size=2,
                                  dtype=dtype,
                                  bias=False) for _ in DOMAINS]
         self.decoders = nn.ModuleList(modules=decoders)
