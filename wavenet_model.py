@@ -133,8 +133,10 @@ class WaveNetModel(nn.Module):
         # WaveNet layers
         for i in range(self.blocks * self.layers):
             dilation = 2 ** (i % self.layers)
-            d = F.pad(l, ((self.kernel_size-1)*dilation, 0))
+            padding = (self.kernel_size-1)*dilation
+            d = F.pad(l, (padding, 0))
             d = self.dilated_convs[i](d)
+            d = d[:,:,:-padding]
 
             # condition
             cond = self.cond_convs[i](en)
