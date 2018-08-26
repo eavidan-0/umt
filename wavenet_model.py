@@ -4,6 +4,8 @@ import time
 from wavenet_modules import *
 from audio_data import *
 
+import torch.nn.functional as F
+
 from math import ceil
 
 
@@ -79,7 +81,6 @@ class WaveNetModel(nn.Module):
                 # dilations of this layer
                 self.dilations.append((new_dilation, init_dilation))
                 
-                padding = math.ceil(new_dilation * (kernel_size - 1) / 2)
                 self.cond_convs.append(nn.Conv1d(in_channels=classes,
                                                  out_channels=dilation_channels,
                                                  kernel_size=1,
@@ -89,7 +90,6 @@ class WaveNetModel(nn.Module):
                                                     out_channels=dilation_channels,
                                                     kernel_size=kernel_size,
                                                     dilation=2**i,
-                                                    padding=padding,
                                                     bias=bias))
 
                 # 1x1 convolution for residual connection
@@ -132,7 +132,11 @@ class WaveNetModel(nn.Module):
 
         # WaveNet layers
         for i in range(self.blocks * self.layers):
-            d = self.dilated_convs[i](l)
+            dilation = 2 ** (i % self.layers)
+            d = F.pad(d, ((self.kernel_sze-1)*dilation, 0))
+            d = self.dilated_convs[i](d)
+
+            # condition
             cond = self.cond_convs[i](en)
             d = self._condition(d, cond)
 
