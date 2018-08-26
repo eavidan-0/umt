@@ -165,15 +165,16 @@ class WaveNetModel(nn.Module):
         """
         print(x.size())
         print(encoding.size())
-        mb, length, channels = x.size()
-        enc_mb, enc_length, enc_channels = encoding.size()
+        mb, channels, length = x.size()
+        enc_mb, enc_channels, enc_length = encoding.size()
         assert enc_mb == mb
         assert enc_channels == channels
 
-        encoding = torch.view(encoding, [mb, enc_length, 1, channels])
-        x = torch.view(x, [mb, enc_length, -1, channels])
+        # TODO: maybe try transposing dim1,2 instead of just flipping?
+        encoding = torch.view(encoding, [mb, channels, 1, enc_length])
+        x = torch.view(x, [mb, channels, -1, enc_length])
         x += encoding
-        x = torch.view(x, [mb, length, channels])
+        x = torch.view(x, [mb, channels, length])
         return x
 
     def parameter_count(self):
