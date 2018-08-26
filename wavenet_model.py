@@ -128,7 +128,7 @@ class WaveNetModel(nn.Module):
 
         # WaveNet layers
         for i in range(self.blocks * self.layers):
-            d = self._dilated_convs[i](l)
+            d = self.dilated_convs[i](l)
             cond = self.cond_convs[i](input)
             d = self._condition(d, cond)
 
