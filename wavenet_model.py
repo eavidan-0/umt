@@ -34,7 +34,6 @@ class WaveNetModel(nn.Module):
                  dilation_channels,
                  residual_channels,
                  skip_channels,
-                 end_channels=256,
                  classes=256,
                  kernel_size=2,
                  dtype=torch.FloatTensor,
@@ -57,16 +56,21 @@ class WaveNetModel(nn.Module):
 
         self.dilations = []
 
-        self.filter_convs = nn.ModuleList()
-        self.gate_convs = nn.ModuleList()
+        self.cond_convs = nn.ModuleList()
+        self.dilated_convs = nn.ModuleList()
         self.residual_convs = nn.ModuleList()
         self.skip_convs = nn.ModuleList()
 
         # 1x1 convolution to create channels
-        self.start_conv = nn.Conv1d(in_channels=self.classes,
-                                    out_channels=residual_channels,
-                                    kernel_size=1,
-                                    bias=bias)
+        self.start_conv_1 = nn.Conv1d(in_channels=self.classes,
+                                      out_channels=residual_channels,
+                                      kernel_size=1,
+                                      bias=bias)
+        
+        self.start_conv_2 = nn.Conv1d(in_channels=self.classes,
+                                      out_channels=skip_channels,
+                                      kernel_size=1,
+                                      bias=bias)
 
         for b in range(blocks):
             additional_scope = kernel_size - 1
@@ -75,16 +79,16 @@ class WaveNetModel(nn.Module):
                 # dilations of this layer
                 self.dilations.append((new_dilation, init_dilation))
 
-                # dilated convolutions
-                self.filter_convs.append(nn.Conv1d(in_channels=residual_channels,
-                                                   out_channels=dilation_channels,
-                                                   kernel_size=kernel_size,
-                                                   bias=bias))
-
-                self.gate_convs.append(nn.Conv1d(in_channels=residual_channels,
+                self.cond_convs.append(nn.Conv1d(in_channels=residual_channels,
                                                  out_channels=dilation_channels,
-                                                 kernel_size=kernel_size,
+                                                 kernel_size=1,
                                                  bias=bias))
+
+                self.dilated_convs.append(nn.Conv1d(in_channels=residual_channels,
+                                                    out_channels=dilation_channels,
+                                                    kernel_size=kernel_size,
+                                                    dilation=2**i,
+                                                    bias=bias))
 
                 # 1x1 convolution for residual connection
                 self.residual_convs.append(nn.Conv1d(in_channels=dilation_channels,
@@ -104,11 +108,11 @@ class WaveNetModel(nn.Module):
                 new_dilation *= 2
 
         self.end_conv_1 = nn.Conv1d(in_channels=skip_channels,
-                                    out_channels=end_channels,
+                                    out_channels=classes,
                                     kernel_size=1,
                                     bias=True)
 
-        self.end_conv_2 = nn.Conv1d(in_channels=end_channels,
+        self.end_conv_2 = nn.Conv1d(in_channels=classes,
                                     out_channels=classes,
                                     kernel_size=1,
                                     bias=True)
@@ -116,59 +120,58 @@ class WaveNetModel(nn.Module):
         self.receptive_field = receptive_field
 
     def wavenet(self, input):
-
-        x = self.start_conv(input)
-        skip = 0
+        # TODO: this was x_scaled, and en was not upsampled
+        l = masked.shift_right(input)
+        l = self.start_conv_1(l) 
+        s = self.start_conv_2(l) 
 
         # WaveNet layers
         for i in range(self.blocks * self.layers):
+            d = self._dilated_convs[i](l)
+            cond = self.cond_convs[i](input)
+            d = self._condition(d, cond)
 
-            #			 |----------------------------------------|     *residual*
-            #            |                                        |
-            # 			 |	  |-- conv -- tanh --|			      |
-            # -> dilate -|----|                  * ----|-- 1x1 -- + -->	*input*
-            #				  |-- conv -- sigm --|     |
-            #							              1x1
-            #							               |
-            # ---------------------------------------> + ------------->	*skip*
+            assert d.size(2) % 2 == 0, "Need to cut input in half"
+            m = d.size(2) // 2
+            d_sigmoid = torch.sigmoid(d[:, :, :m])
+            d_tanh = torch.tanh(d[:, :, m:])
+            d = d_sigmoid * d_tanh
 
-            (dilation, init_dilation) = self.dilations[i]
+            l += self.residual_convs[i](d)
+            s += self.skip_convs[i](d)
 
-            residual = dilate(x, dilation, init_dilation, i)
+        s = torch.relu(s)
+        s = self.end_conv_1(s)
+        s = self._condition(s, self.end_conv_2(input))
+        s = torch.relu(s)
 
-            # dilated convolution
-            filter = self.filter_convs[i](residual)
-            filter = torch.tanh(filter)
-            gate = self.gate_convs[i](residual)
-            gate = torch.sigmoid(gate)
-            x = filter * gate
-
-            # parametrized skip connection
-            s = x
-            if x.size(2) != 1:
-                s = dilate(x, 1, init_dilation=dilation)
-            s = self.skip_convs[i](s)
-            try:
-                skip = skip[:, :, -s.size(2):]
-            except:
-                skip = 0
-            skip = s + skip
-
-            x = self.residual_convs[i](x)
-            x = x + residual[:, :, (self.kernel_size - 1):]
-
-        x = F.relu(skip)
-        x = F.relu(self.end_conv_1(x))
-        x = self.end_conv_2(x)
-
-        return x
+        return s
 
     def forward(self, input):
         x = self.wavenet(input)
         
-        l = 2 ** (self.layers - 1)
-        out = x[:, :, -l:]
+        # l = 2 ** (self.layers - 1)
+        out = x[:, :, -SR:]
         return out
+
+    def _condition(x, encoding):
+        """Condition the input on the encoding.
+        Args:
+        x: The [mb, length, channels] float tensor input.
+        encoding: The [mb, encoding_length, channels] float tensor encoding.
+        Returns:
+        The output after broadcasting the encoding to x's shape and adding them.
+        """
+        mb, length, channels = x.size()
+        enc_mb, enc_length, enc_channels = encoding.size()
+        assert enc_mb == mb
+        assert enc_channels == channels
+
+        encoding = torch.view(encoding, [mb, enc_length, 1, channels])
+        x = torch.view(x, [mb, enc_length, -1, channels])
+        x += encoding
+        x = torch.view(x, [mb, length, channels])
+        return x
 
     def parameter_count(self):
         par = list(self.parameters())

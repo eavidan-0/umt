@@ -24,15 +24,17 @@ class UmtModel(nn.Module):
         self.encoder = EncoderModel(blocks=3,
                                     layers=10,
                                     classes=self.classes,
+                                    kernel_size=3,
                                     dtype=dtype,
                                     bias=False)
 
         decoders = [WaveNetModel(blocks=4,
                                  layers=10,
-                                 dilation_channels=32,
-                                 residual_channels=16,
+                                 dilation_channels=512,
+                                 residual_channels=256,
                                  skip_channels=512,
                                  classes=self.classes,
+                                 kernel_size=3,
                                  dtype=dtype,
                                  bias=False) for _ in DOMAINS]
         self.decoders = nn.ModuleList(modules=decoders)

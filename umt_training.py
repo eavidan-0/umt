@@ -79,7 +79,7 @@ class UmtTrainer:
         step = int(start_epoch * self.snapshot_interval)
 
         # return to previous params
-        for _ in range(step // 1000):
+        for _ in range(step // 10000):
             self.decay_lr()
 
         snapshot_prefix = self.snapshot_path + '/' + self.snapshot_name + '_'
@@ -92,7 +92,7 @@ class UmtTrainer:
                 torch.save(self.model, snapshot_prefix + time_string)
 
             # New classifier - better confusion?
-            self.create_domain_classifier()
+            # self.create_domain_classifier()
 
             # Shuffle entire batches to ensure same domain index
             for data in roundrobin(dataloaders, halt_on_first=True):
@@ -134,7 +134,7 @@ class UmtTrainer:
                 self.model_optimizer.step()
                 step += 1
 
-                if step % 1000 == 0:
+                if step % 10000 == 0:
                     self.decay_lr()
 
                 print("[EPOCH %d; STEP %d]: loss %.3f classifier_loss %.3f    [%r]" %
