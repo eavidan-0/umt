@@ -119,7 +119,9 @@ class WaveNetModel(nn.Module):
 
         self.receptive_field = receptive_field
 
-    def wavenet(self, input):
+    def wavenet(self, input_tuple):
+        input, en = input_tuple
+
         # TODO: this was x_scaled, and en was not upsampled
         # l = masked.shift_right(x_scaled)
         l = F.interpolate(input, size=SR, mode='nearest')
@@ -129,7 +131,7 @@ class WaveNetModel(nn.Module):
         # WaveNet layers
         for i in range(self.blocks * self.layers):
             d = self.dilated_convs[i](l)
-            cond = self.cond_convs[i](input)
+            cond = self.cond_convs[i](en)
             d = self._condition(d, cond)
 
             assert d.size(2) % 2 == 0, "Need to cut input in half"
@@ -143,7 +145,7 @@ class WaveNetModel(nn.Module):
 
         s = torch.relu(s)
         s = self.end_conv_1(s)
-        s = self._condition(s, self.end_conv_2(input))
+        s = self._condition(s, self.end_conv_2(en))
         s = torch.relu(s)
 
         return s
