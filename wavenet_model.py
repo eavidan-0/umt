@@ -168,9 +168,9 @@ class WaveNetModel(nn.Module):
             d_tanh = torch.tanh(d[:, :, m:])
             d = d_sigmoid * d_tanh
 
-            # TODO: +=
-            l = l+ self.residual_convs[i](d)
-            s = s+self.skip_convs[i](d)
+            # Broadcast and condition
+            l += self.residual_convs[i](d).expand_as(l)
+            s += self.skip_convs[i](d).expand_as(s)
 
         s = torch.relu(s)
         s = self.end_conv_1(s)
