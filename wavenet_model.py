@@ -132,6 +132,7 @@ class WaveNetModel(nn.Module):
 
         # WaveNet layers
         for i in range(self.blocks * self.layers):
+            # Causal dilated convolution
             dilation = 2 ** (i % self.layers)
             padding = (self.kernel_size-1)*dilation
             d = F.pad(l, (padding, 0))
@@ -140,6 +141,7 @@ class WaveNetModel(nn.Module):
 
             # condition
             cond = self.cond_convs[i](en)
+            print (dilation, padding, l.size(), d.size(), en.size(), cond.size())
             d = self._condition(d, cond)
 
             assert d.size(2) % 2 == 0, "Need to cut input in half"
