@@ -78,7 +78,8 @@ class WaveNetModel(nn.Module):
             for i in range(layers):
                 # dilations of this layer
                 self.dilations.append((new_dilation, init_dilation))
-
+                
+                padding = math.ceil(new_dilation * (kernel_size - 1) / 2)
                 self.cond_convs.append(nn.Conv1d(in_channels=classes,
                                                  out_channels=dilation_channels,
                                                  kernel_size=1,
@@ -88,7 +89,7 @@ class WaveNetModel(nn.Module):
                                                     out_channels=dilation_channels,
                                                     kernel_size=kernel_size,
                                                     dilation=2**i,
-                                                    padding=1,
+                                                    padding=padding,
                                                     bias=bias))
 
                 # 1x1 convolution for residual connection
