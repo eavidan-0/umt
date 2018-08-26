@@ -169,11 +169,11 @@ class WaveNetModel(nn.Module):
             d = d_sigmoid * d_tanh
 
             # Broadcast and condition
-            d_l = self.residual_convs[i](d).expand_as(l)
-            l += d_l
+            d_stack = map(lambda _: d, range(l.size(2) // d.size(2)))
+            d_exp = torch.stack(list(d_stack)).view(l.size())
 
-            d_s = self.skip_convs[i](d).expand_as(s)
-            s += d_s
+            l += self.residual_convs[i](d_exp)
+            s += self.skip_convs[i](d_exp)
 
         s = torch.relu(s)
         s = self.end_conv_1(s)
