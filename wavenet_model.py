@@ -160,7 +160,6 @@ class WaveNetModel(nn.Module):
         for i in range(self.blocks * self.layers):
             d = self.dilated_convs[i](l)
             cond = self.cond_convs[i](en)
-            print (l.size(), d.size(), cond.size())
             d = self._condition(d, cond)
 
             assert d.size(2) % 2 == 0, "Need to cut input in half"
@@ -169,8 +168,9 @@ class WaveNetModel(nn.Module):
             d_tanh = torch.tanh(d[:, :, m:])
             d = d_sigmoid * d_tanh
 
-            l += self.residual_convs[i](d)
-            s += self.skip_convs[i](d)
+            # TODO: +=
+            l = l+ self.residual_convs[i](d)
+            s = s+self.skip_convs[i](d)
 
         s = torch.relu(s)
         s = self.end_conv_1(s)
