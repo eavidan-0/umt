@@ -121,7 +121,8 @@ class WaveNetModel(nn.Module):
 
     def wavenet(self, input):
         # TODO: this was x_scaled, and en was not upsampled
-        l = masked.shift_right(input)
+        # l = masked.shift_right(x_scaled)
+        l = input
         l = self.start_conv_1(l) 
         s = self.start_conv_2(l) 
 
