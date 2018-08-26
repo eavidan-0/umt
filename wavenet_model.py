@@ -169,6 +169,7 @@ class WaveNetModel(nn.Module):
             d = d_sigmoid * d_tanh
 
             # Broadcast and condition
+            # TODO: is this correct broadcast
             d_l = self.residual_convs[i](d)
             d_l_stack = map(lambda _: d_l, range(l.size(2) // d_l.size(2)))
             d_l_exp = torch.stack(list(d_l_stack)).view(l.size())
