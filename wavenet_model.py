@@ -88,6 +88,7 @@ class WaveNetModel(nn.Module):
                                                     out_channels=dilation_channels,
                                                     kernel_size=kernel_size,
                                                     dilation=2**i,
+                                                    padding=1,
                                                     bias=bias))
 
                 # 1x1 convolution for residual connection
@@ -124,7 +125,7 @@ class WaveNetModel(nn.Module):
 
         # TODO: this was x_scaled, and en was not upsampled
         # l = masked.shift_right(x_scaled)
-        l = F.interpolate(input, size=SR, mode='nearest')
+        l = input
         l = self.start_conv_1(l) 
         s = self.start_conv_2(l) 
 
