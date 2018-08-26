@@ -62,7 +62,7 @@ class WaveNetModel(nn.Module):
         self.skip_convs = nn.ModuleList()
 
         # 1x1 convolution to create channels
-        self.start_conv_1 = nn.Conv1d(in_channels=self.classes,
+        self.start_conv_1 = nn.Conv1d(in_channels=classes,
                                       out_channels=residual_channels,
                                       kernel_size=1,
                                       bias=bias)
@@ -79,7 +79,7 @@ class WaveNetModel(nn.Module):
                 # dilations of this layer
                 self.dilations.append((new_dilation, init_dilation))
 
-                self.cond_convs.append(nn.Conv1d(in_channels=residual_channels,
+                self.cond_convs.append(nn.Conv1d(in_channels=classes,
                                                  out_channels=dilation_channels,
                                                  kernel_size=1,
                                                  bias=bias))
