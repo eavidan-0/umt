@@ -8,6 +8,32 @@ import torch.nn.functional as F
 
 from math import ceil
 
+class CausalConv1d(nn.Conv1d):
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size,
+                 stride=1,
+                 dilation=1,
+                 groups=1,
+                 bias=True):
+        self.__padding = (kernel_size - 1) * dilation
+
+        super(CausalConv1d, self).__init__(
+            in_channels,
+            out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=self.__padding,
+            dilation=dilation,
+            groups=groups,
+            bias=bias)
+
+    def forward(self, input):
+        result = super(CausalConv1d, self).forward(input)
+        if self.__padding != 0:
+            return result[:, :, :-self.__padding]
+        return result
 
 class WaveNetModel(nn.Module):
     """
@@ -86,11 +112,11 @@ class WaveNetModel(nn.Module):
                                                  kernel_size=1,
                                                  bias=bias))
 
-                self.dilated_convs.append(nn.Conv1d(in_channels=residual_channels,
-                                                    out_channels=dilation_channels,
-                                                    kernel_size=kernel_size,
-                                                    dilation=2**i,
-                                                    bias=bias))
+                self.dilated_convs.append(CausalConv1d(in_channels=residual_channels,
+                                                       out_channels=dilation_channels,
+                                                       kernel_size=kernel_size,
+                                                       dilation=2**i,
+                                                       bias=bias))
 
                 # 1x1 convolution for residual connection
                 self.residual_convs.append(nn.Conv1d(in_channels=dilation_channels,
@@ -132,16 +158,9 @@ class WaveNetModel(nn.Module):
 
         # WaveNet layers
         for i in range(self.blocks * self.layers):
-            # Causal dilated convolution
-            dilation = 2 ** (i % self.layers)
-            padding = (self.kernel_size-1)*dilation
-            d = F.pad(l, (padding, 0))
-            d = self.dilated_convs[i](d)
-            d = d[:,:,:-padding]
-
-            # condition
+            d = self.dilated_convs[i](l)
             cond = self.cond_convs[i](en)
-            print (dilation, padding, l.size(), d.size(), en.size(), cond.size())
+            print (l.size(), d.size(), cond.size())
             d = self._condition(d, cond)
 
             assert d.size(2) % 2 == 0, "Need to cut input in half"
