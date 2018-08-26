@@ -163,18 +163,16 @@ class WaveNetModel(nn.Module):
         Returns:
         The output after broadcasting the encoding to x's shape and adding them.
         """
-        print(x.size())
-        print(encoding.size())
         mb, channels, length = x.size()
         enc_mb, enc_channels, enc_length = encoding.size()
         assert enc_mb == mb
         assert enc_channels == channels
 
         # TODO: maybe try transposing dim1,2 instead of just flipping?
-        encoding = torch.view(encoding, [mb, channels, 1, enc_length])
-        x = torch.view(x, [mb, channels, -1, enc_length])
+        encoding = encoding.view([mb, channels, 1, enc_length])
+        x = x.view([mb, channels, -1, enc_length])
         x += encoding
-        x = torch.view(x, [mb, channels, length])
+        x = x.view([mb, channels, length])
         return x
 
     def parameter_count(self):
