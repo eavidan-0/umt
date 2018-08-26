@@ -163,6 +163,8 @@ class WaveNetModel(nn.Module):
         Returns:
         The output after broadcasting the encoding to x's shape and adding them.
         """
+        print(x.size())
+        print(encoding.size())
         mb, length, channels = x.size()
         enc_mb, enc_length, enc_channels = encoding.size()
         assert enc_mb == mb
