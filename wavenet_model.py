@@ -67,7 +67,7 @@ class WaveNetModel(nn.Module):
                                       kernel_size=1,
                                       bias=bias)
         
-        self.start_conv_2 = nn.Conv1d(in_channels=self.classes,
+        self.start_conv_2 = nn.Conv1d(in_channels=residual_channels,
                                       out_channels=skip_channels,
                                       kernel_size=1,
                                       bias=bias)
