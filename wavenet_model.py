@@ -80,9 +80,6 @@ class WaveNetModel(nn.Module):
 
         # build model
         receptive_field = 1
-        init_dilation = 1
-
-        self.dilations = []
 
         self.cond_convs = nn.ModuleList()
         self.dilated_convs = nn.ModuleList()
@@ -102,11 +99,8 @@ class WaveNetModel(nn.Module):
 
         for b in range(blocks):
             additional_scope = kernel_size - 1
-            new_dilation = 1
             for i in range(layers):
                 # dilations of this layer
-                self.dilations.append((new_dilation, init_dilation))
-                
                 self.cond_convs.append(nn.Conv1d(in_channels=classes,
                                                  out_channels=dilation_channels,
                                                  kernel_size=1,
@@ -132,8 +126,6 @@ class WaveNetModel(nn.Module):
 
                 receptive_field += additional_scope
                 additional_scope *= 2
-                init_dilation = new_dilation
-                new_dilation *= 2
 
         self.end_conv_1 = nn.Conv1d(in_channels=skip_channels,
                                     out_channels=classes,
@@ -169,16 +161,8 @@ class WaveNetModel(nn.Module):
             d = d_sigmoid * d_tanh
 
             # Broadcast and condition
-            # TODO: is this correct broadcast, += why not? grad
-            d_l = self.residual_convs[i](d)
-            d_l_stack = map(lambda _: d_l, range(l.size(2) // d_l.size(2)))
-            d_l_exp = torch.stack(list(d_l_stack)).view(l.size())
-            l = l + d_l_exp
-
-            d_s = self.skip_convs[i](d)
-            d_s_stack = map(lambda _: d_s, range(s.size(2) // d_s.size(2)))
-            d_s_exp = torch.stack(list(d_s_stack)).view(s.size())
-            s = s + d_s_exp
+            l = self._broadcast_add(l, self.residual_convs[i](d))
+            s = self._broadcast_add(s, self.skip_convs[i](d))
 
         s = torch.relu(s)
         s = self.end_conv_1(s)
@@ -193,6 +177,11 @@ class WaveNetModel(nn.Module):
         # l = 2 ** (self.layers - 1)
         out = x[:, :, -SR:]
         return out
+
+    def _broadcast_add(self, x, v):
+        v_stack = map(lambda _: v, range(x.size(2) // v.size(2)))
+        v_broad = torch.stack(list(v_stack)).view(x.size())
+        return x + v_broad
 
     def _condition(self, x, encoding):
         """Condition the input on the encoding.
