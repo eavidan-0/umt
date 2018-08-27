@@ -7,7 +7,7 @@ class DomainClassifier(nn.Module):
         super(DomainClassifier, self).__init__()
 
         self.classes = classes
-        kernel_size = 3
+        kernel_size = 24
 
         channels_1 = classes * 4
         channels_2 = classes * 8
