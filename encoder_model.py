@@ -85,7 +85,7 @@ class EncoderModel(nn.Module):
 
             # Step 5: Skip and Residual summation
             layer_output_length = residual.size(2)
-            x = x[:, :, -layer_output_length:] + residual
+            x = x[:, :, :-layer_output_length] + residual
 
         output_length = input.size()[2] - self.input_trim
         assert x.size()[2] == output_length, "expected encoder output %d, got %r" % (
