@@ -7,7 +7,7 @@ import math
 import numpy as np
 
 ENC_LEN = 64
-POOL_KERNEL = 512
+POOL_KERNEL = 200
 
 
 class EncoderModel(nn.Module):
