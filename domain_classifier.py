@@ -11,7 +11,7 @@ class DomainClassifier(nn.Module):
 
         channels_1 = classes * 4
         channels_2 = classes * 8
-        channels_1 = classes * 2
+        channels_3 = classes * 2
 
         self.conv_1 = nn.Conv1d(in_channels=classes,
                                 out_channels=channels_1,
