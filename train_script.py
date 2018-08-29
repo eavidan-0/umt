@@ -40,7 +40,6 @@ for domain_index in range(len(DOMAINS)):
                           target_length=SR,
                           file_location=DATASET_SOURCE_BASE + domain,
                           domain_index=domain_index,
-                          dtype=dtype,
                           train=True,
                           test_stride=5000000)
 
