@@ -136,6 +136,7 @@ class WavenetDataset(torch.utils.data.Dataset):
         # Only if training: Pitch modulation
         if self.train:
             # Reverse quantization and encoding
+            print (sample)
             y = decode_mu(sample, self.classes)
 
             seg_length = int(self.sampling_rate *
