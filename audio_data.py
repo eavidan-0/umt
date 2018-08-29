@@ -76,7 +76,7 @@ class WavenetDataset(torch.utils.data.Dataset):
             print("  processed " + str(i) + " of " + str(len(files)) + " files")
             file_data, _ = lr.load(path=file,
                                    sr=self.sampling_rate,
-                                   mono=self.mono)[:self.sampling_rate]
+                                   mono=self.mono)
             if self.normalize:
                 file_data = lr.util.normalize(file_data)
             quantized_data = quantize_data(
