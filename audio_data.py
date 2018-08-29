@@ -76,7 +76,7 @@ class WavenetDataset(torch.utils.data.Dataset):
             print("  processed " + str(i) + " of " + str(len(files)) + " files")
             file_data, _ = lr.load(path=file,
                                    sr=self.sampling_rate,
-                                   mono=self.mono)
+                                   mono=self.mono)[:self.sampling_rate]
             if self.normalize:
                 file_data = lr.util.normalize(file_data)
             quantized_data = quantize_data(
@@ -179,7 +179,7 @@ def quantize_data(data, classes, mu=True):
 def decode_mu(data, classes):
     y = (data / classes) * 2. - 1
     y = mu_law_expansion(y, classes)
-    return y;
+    return y
 
 def list_all_audio_files(location):
     audio_files = []
@@ -205,7 +205,6 @@ def mu_law_encoding(data, mu):
 
 
 def mu_law_expansion(data, mu):
-    print (np, type(np))
     s = np.sign(data) * (np.exp(np.abs(data) * np.log(mu + 1)) - 1) / mu
     return s
 
