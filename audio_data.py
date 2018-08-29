@@ -203,7 +203,10 @@ def mu_law_encoding(data, mu):
 
 
 def mu_law_expansion(data, mu):
-    s = np.sign(data) * (np.exp(np.abs(data) * np.log(mu + 1)) - 1) / mu
+    pow = np.abs(data) * np.log(mu + 1)
+    print (data.dtype, pow.dtype)
+
+    s = np.sign(data) * (np.exp(pow) - 1) / mu
     return s
 
 
