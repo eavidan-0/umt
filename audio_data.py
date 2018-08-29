@@ -120,13 +120,15 @@ class WavenetDataset(torch.utils.data.Dataset):
 
         if end_position_in_next_file < 0:
             file_name = 'arr_' + str(file_index)
-            this_file = self.data[file_name]
+            this_file = np.load(self.dataset_file, mmap_mode='r')[file_name]
             sample = this_file[position_in_file:position_in_file +
                                self._item_length + 1]
         else:
             # load from two files
-            file1 = self.data['arr_' + str(file_index)]
-            file2 = self.data['arr_' + str(file_index + 1)]
+            file1 = np.load(self.dataset_file, mmap_mode='r')[
+                'arr_' + str(file_index)]
+            file2 = np.load(self.dataset_file, mmap_mode='r')[
+                'arr_' + str(file_index + 1)]
             sample1 = file1[position_in_file:]
             sample2 = file2[:end_position_in_next_file]
             sample = np.concatenate((sample1, sample2))
@@ -203,8 +205,7 @@ def mu_law_encoding(data, mu):
 
 
 def mu_law_expansion(data, mu):
-    pow = np.abs(data) * np.log(mu + 1)
-    s = np.sign(data) * (np.exp(pow) - 1) / mu
+    s = np.sign(data) * (np.exp(np.abs(data) * np.log(mu + 1)) - 1) / mu
     return s
 
 
