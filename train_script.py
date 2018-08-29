@@ -7,7 +7,7 @@ from scipy.io import wavfile
 from time import sleep
 sleep(2)
 
-DATASET_SOURCE_BASE = "/home/eavidan/Music/"
+DATASET_SOURCE_BASE = "/home/eyala/audio/"
 DATASET_LOCATION = "./datasets/"
 
 dtype = torch.FloatTensor
