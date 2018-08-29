@@ -45,9 +45,7 @@ class WavenetDataset(torch.utils.data.Dataset):
         self.domain_index = domain_index
         self.sampling_rate = sampling_rate
 
-        print (dataset_file, file_location)
         if not os.path.isfile(dataset_file):
-            print("new")
             assert file_location is not None, "no location for dataset files specified"
             self.mono = mono
             self.normalize = normalize
