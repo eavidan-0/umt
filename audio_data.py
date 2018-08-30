@@ -87,7 +87,7 @@ class WavenetDataset(torch.utils.data.Dataset):
                 if all(map(lambda x: abs(x) < 1e-10, sample)):
                     continue
                 
-                file_data = np.concatenate(file_data, sample)
+                file_data = np.concatenate([file_data, sample])
 
             if self.normalize:
                 file_data = lr.util.normalize(file_data)
