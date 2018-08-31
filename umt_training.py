@@ -33,7 +33,7 @@ class UmtTrainer:
                  optimizer=optim.Adam,
                  lr=INIT_LR,
                  weight_decay=0,
-                 gradient_clipping=None,
+                 gradient_clipping=5,
                  snapshot_path=None,
                  snapshot_name='snapshot',
                  snapshot_interval=100,
