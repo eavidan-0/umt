@@ -24,7 +24,7 @@ model = UmtModel(dtype)
 print('parameter count: ', model.parameter_count())
 
 # reload snapshot
-start_epoch = 24
+start_epoch = 30
 model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
 if use_cuda:
