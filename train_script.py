@@ -48,7 +48,7 @@ for domain_index in range(len(DOMAINS)):
 trainer = UmtTrainer(model=model,
                      datasets=datasets,
                      snapshot_path='snapshots',
-                     snapshot_name='umt_2nsynth',
+                     snapshot_name='umt_en_nsynth',
                      dtype=dtype,
                      ltype=ltype)
 
