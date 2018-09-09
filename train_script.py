@@ -24,8 +24,8 @@ model = UmtModel(dtype)
 print('parameter count: ', model.parameter_count())
 
 # reload snapshot
-start_epoch = 0
-# model = load_latest_model_from('snapshots', use_cuda=use_cuda)
+start_epoch = 7
+model = load_latest_model_from('snapshots', use_cuda=use_cuda)
 
 if use_cuda:
     print("move model to gpu")
