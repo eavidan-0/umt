@@ -12,7 +12,8 @@ import torch.nn.functional as F
 
 from random import random, randint
 
-DOMAINS = ["_flute", "_guitar", "_organ", "_vocal"]
+DOMAINS = ["Ed Sheeran", "Metallica", "Coldplay", "Bon Jovi"]
+# DOMAINS = ["_flute", "_guitar", "_organ", "_vocal"]
 DOMAIN_IDS = list(range(len(DOMAINS)))
 SR = 16000
 BATCH_SIZE = 16
