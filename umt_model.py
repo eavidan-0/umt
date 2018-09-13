@@ -22,8 +22,8 @@ class UmtModel(nn.Module):
         self.is_training = train
 
         # TODO: kernel size 3?
-        self.encoder = EncoderModel(blocks=2,
-                                    layers=10,
+        self.encoder = EncoderModel(blocks=3,
+                                    layers=6,
                                     classes=self.classes,
                                     kernel_size=2,
                                     dtype=dtype,
