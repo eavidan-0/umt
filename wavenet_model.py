@@ -114,10 +114,11 @@ class WaveNetModel(nn.Module):
 
     def wavenet(self, input_tuple):
         input, en = input_tuple
+        en = F.interpolate(en, size=SR, mode='nearest')
 
         # TODO: this was x_scaled, and en was not upsampled
         # l = masked.shift_right(x_scaled)
-        l = F.interpolate(en, size=SR, mode='nearest') # input
+        l = en # input
         l = self.start_conv_1(l) 
         s = self.start_conv_2(l) 
 
