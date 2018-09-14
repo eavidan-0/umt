@@ -22,18 +22,18 @@ class UmtModel(nn.Module):
         self.is_training = train
 
         # TODO: kernel size 3?
-        self.encoder = EncoderModel(blocks=2,
+        self.encoder = EncoderModel(blocks=3,
                                     layers=10,
                                     classes=self.classes,
                                     kernel_size=2,
                                     dtype=dtype,
                                     bias=False)
 
-        decoders = [WaveNetModel(blocks=3,
-                                 layers=8,
-                                 dilation_channels=64,
-                                 residual_channels=32,
-                                 skip_channels=64,
+        decoders = [WaveNetModel(blocks=4,
+                                 layers=10,
+                                 dilation_channels=256,
+                                 residual_channels=128,
+                                 skip_channels=256,
                                  classes=self.classes,
                                  kernel_size=2,
                                  dtype=dtype,
