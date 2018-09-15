@@ -162,7 +162,7 @@ class UmtTrainer:
 def create_dataloader(dataset, batch_size):
     return torch.utils.data.DataLoader(dataset,
                                        batch_size=batch_size,
-                                       shuffle=False,  # TODO: maybe batches?
+                                       shuffle=True,  # TODO: maybe batches?
                                        num_workers=4,
                                        drop_last=True,
                                        pin_memory=False)
