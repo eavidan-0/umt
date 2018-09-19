@@ -61,6 +61,7 @@ class UmtTrainer:
         self.dtype = dtype
         self.ltype = ltype
 
+        self.decay_lr_times = 0
         self.create_domain_classifier()
 
     def train(self,
@@ -141,8 +142,12 @@ class UmtTrainer:
                       (current_epoch, step, loss, classifier_loss.item(), DOMAINS[domain_index[0]]))
 
     def decay_lr(self):
-        self.lr = self.lr * LR_DECAY
-        print ("DECAY LR")
+        self.decay_lr_times += 1
+
+        new_lr = INIT_LR if self.decay_lr_times % 500 == 0 else self.lr * LR_DECAY
+
+        self.lr = new_lr
+        print ("DECAY LR", new_lr)
 
         self.set_lr(self.classifier_optimizer)
         self.set_lr(self.model_optimizer)
