@@ -102,5 +102,5 @@ def load_latest_model_from(location, use_cuda=True):
     else:
         model = load_to_cpu(newest_file)
 
-    # epoch = newest_file.split('_')[-1]
-    return model
+    epoch = newest_file.split('_')[-1]
+    return model, int(epoch)
