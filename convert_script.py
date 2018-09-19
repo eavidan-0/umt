@@ -21,7 +21,7 @@ if use_cuda:
     dtype = torch.cuda.FloatTensor
     ltype = torch.cuda.LongTensor
 
-model = load_latest_model_from('snapshots', use_cuda=use_cuda)
+(model, __) = load_latest_model_from('snapshots', use_cuda=use_cuda)
 model.train = False
 
 classes = model.classes
