@@ -90,7 +90,7 @@ class UmtTrainer:
 
             if current_epoch > start_epoch:
                 time_string = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
-                torch.save(self.model, snapshot_prefix + time_string)
+                torch.save(self.model, snapshot_prefix + time_string + '_' + current_epoch)
 
             # New classifier - better confusion?
             # self.create_domain_classifier()
@@ -142,11 +142,11 @@ class UmtTrainer:
                       (current_epoch, step, loss, classifier_loss.item(), DOMAINS[domain_index[0]]))
 
     def decay_lr(self):
-        self.decay_lr_times += 1
-
-        new_lr = INIT_LR if self.decay_lr_times % 250 == 0 else self.lr * LR_DECAY
-
+        # self.decay_lr_times += 1
+        # new_lr = INIT_LR if self.decay_lr_times % 250 == 0 else self.lr * LR_DECAY
+        new_lr = self.lr * LR_DECAY
         self.lr = new_lr
+
         print ("DECAY LR", new_lr)
 
         self.set_lr(self.classifier_optimizer)
