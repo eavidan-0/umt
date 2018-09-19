@@ -144,7 +144,7 @@ class UmtTrainer:
     def decay_lr(self):
         self.decay_lr_times += 1
 
-        new_lr = INIT_LR if self.decay_lr_times % 500 == 0 else self.lr * LR_DECAY
+        new_lr = INIT_LR if self.decay_lr_times % 250 == 0 else self.lr * LR_DECAY
 
         self.lr = new_lr
         print ("DECAY LR", new_lr)
