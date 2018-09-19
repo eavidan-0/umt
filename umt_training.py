@@ -90,7 +90,7 @@ class UmtTrainer:
 
             if current_epoch > start_epoch:
                 time_string = time.strftime("%Y-%m-%d_%H-%M", time.gmtime())
-                torch.save(self.model, snapshot_prefix + time_string + '_' + current_epoch)
+                torch.save(self.model, snapshot_prefix + time_string + '_' + str(current_epoch))
 
             # New classifier - better confusion?
             # self.create_domain_classifier()
